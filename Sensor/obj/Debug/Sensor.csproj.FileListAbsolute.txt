@@ -1,0 +1,10 @@
+C:\work\Sensor\Sensor\Sensor\bin\Debug\Sensor.exe.config
+C:\work\Sensor\Sensor\Sensor\obj\Debug\Sensor.csprojResolveAssemblyReference.cache
+C:\work\Sensor\Sensor\Sensor\obj\Debug\Sensor.Properties.Resources.resources
+C:\work\Sensor\Sensor\Sensor\obj\Debug\Sensor.csproj.GenerateResource.Cache
+C:\work\Sensor\Sensor\Sensor\bin\Debug\Sensor.exe
+C:\work\Sensor\Sensor\Sensor\bin\Debug\Sensor.pdb
+C:\work\Sensor\Sensor\Sensor\obj\Debug\Sensor.exe
+C:\work\Sensor\Sensor\Sensor\obj\Debug\Sensor.pdb
+C:\work\Sensor\Sensor\Sensor\obj\Debug\Sensor.FormMain.resources
+C:\work\Sensor\Sensor\Sensor\obj\Debug\Sensor.FormConfig.resources
