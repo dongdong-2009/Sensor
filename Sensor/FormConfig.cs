@@ -178,8 +178,15 @@ namespace Sensor
             string stepStr = stepText.Text;
             string fmt;
             UInt64 start, step;
+            fixStr = fixStr.Trim();
+            startStr = startStr.Trim();
+            stepStr = stepStr.Trim();
             if (fixStr=="") {
                 MessageBox.Show("请输入固定的字符序列");
+                return;
+            }
+            if (fixStr.Contains(" ")) {
+                MessageBox.Show("固定的字符序列不应该包含空格");
                 return;
             }
             if (startStr == "")

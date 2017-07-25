@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.导入配置文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -45,17 +45,24 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.testParamsGrid = new System.Windows.Forms.DataGridView();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.sensorParamsGrid = new System.Windows.Forms.DataGridView();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.channelsCrid = new System.Windows.Forms.DataGridView();
             this.testParam = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.testValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.testUnit = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.sensorParamsGrid = new System.Windows.Forms.DataGridView();
             this.sensorParam = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.sensorValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.sensorUnit = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.labelInnerPressure = new System.Windows.Forms.Label();
+            this.labelSourcePressure = new System.Windows.Forms.Label();
+            this.labelCurrentTime = new System.Windows.Forms.Label();
+            this.labelTotleTime = new System.Windows.Forms.Label();
+            this.labelChannelCount = new System.Windows.Forms.Label();
+            this.labelCycleCount = new System.Windows.Forms.Label();
+            this.labelState = new System.Windows.Forms.Label();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.channelsCrid = new System.Windows.Forms.DataGridView();
             this.channelCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.sensorNameCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.highValueCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -73,13 +80,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.testParamsGrid)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.sensorParamsGrid)).BeginInit();
+            this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.channelsCrid)).BeginInit();
             this.SuspendLayout();
             // 
             // statusStrip1
             // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 611);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 670);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1029, 22);
             this.statusStrip1.TabIndex = 0;
@@ -102,12 +110,14 @@
             this.导入配置文件ToolStripMenuItem.Name = "导入配置文件ToolStripMenuItem";
             this.导入配置文件ToolStripMenuItem.Size = new System.Drawing.Size(92, 21);
             this.导入配置文件ToolStripMenuItem.Text = "导入配置文件";
+            this.导入配置文件ToolStripMenuItem.Click += new System.EventHandler(this.导入配置文件ToolStripMenuItem_Click);
             // 
             // 导出配置文件ToolStripMenuItem
             // 
             this.导出配置文件ToolStripMenuItem.Name = "导出配置文件ToolStripMenuItem";
             this.导出配置文件ToolStripMenuItem.Size = new System.Drawing.Size(92, 21);
             this.导出配置文件ToolStripMenuItem.Text = "导出配置文件";
+            this.导出配置文件ToolStripMenuItem.Click += new System.EventHandler(this.导出配置文件ToolStripMenuItem_Click);
             // 
             // 导出测试数据ToolStripMenuItem
             // 
@@ -139,6 +149,7 @@
             this.startBtn.Name = "startBtn";
             this.startBtn.Size = new System.Drawing.Size(40, 40);
             this.startBtn.Text = "toolStripButton1";
+            this.startBtn.Click += new System.EventHandler(this.startBtn_Click);
             // 
             // pauseBtn
             // 
@@ -150,6 +161,7 @@
             this.pauseBtn.Name = "pauseBtn";
             this.pauseBtn.Size = new System.Drawing.Size(40, 40);
             this.pauseBtn.Text = "toolStripButton1";
+            this.pauseBtn.Click += new System.EventHandler(this.pauseBtn_Click);
             // 
             // stopBtn
             // 
@@ -161,6 +173,7 @@
             this.stopBtn.Name = "stopBtn";
             this.stopBtn.Size = new System.Drawing.Size(40, 40);
             this.stopBtn.Text = "toolStripButton1";
+            this.stopBtn.Click += new System.EventHandler(this.stopBtn_Click);
             // 
             // toolStripSeparator1
             // 
@@ -192,7 +205,7 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.groupBox3);
-            this.splitContainer1.Size = new System.Drawing.Size(1029, 543);
+            this.splitContainer1.Size = new System.Drawing.Size(1029, 602);
             this.splitContainer1.SplitterDistance = 307;
             this.splitContainer1.TabIndex = 3;
             // 
@@ -207,19 +220,19 @@
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 3;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 45.74468F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 54.25532F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 128F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(307, 543);
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 48.29268F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 51.70732F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 191F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(307, 602);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // groupBox4
             // 
             this.groupBox4.Controls.Add(this.testParamsGrid);
             this.groupBox4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox4.Location = new System.Drawing.Point(3, 192);
+            this.groupBox4.Location = new System.Drawing.Point(3, 201);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(301, 219);
+            this.groupBox4.Size = new System.Drawing.Size(301, 206);
             this.groupBox4.TabIndex = 3;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "测试参数:";
@@ -246,9 +259,33 @@
             this.testParamsGrid.RowHeadersVisible = false;
             this.testParamsGrid.RowTemplate.Height = 23;
             this.testParamsGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.testParamsGrid.Size = new System.Drawing.Size(295, 199);
+            this.testParamsGrid.Size = new System.Drawing.Size(295, 186);
             this.testParamsGrid.TabIndex = 1;
             this.testParamsGrid.MouseUp += new System.Windows.Forms.MouseEventHandler(this.testParamsGrid_MouseUp);
+            // 
+            // testParam
+            // 
+            this.testParam.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.testParam.HeaderText = "参数";
+            this.testParam.Name = "testParam";
+            this.testParam.ReadOnly = true;
+            this.testParam.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.testParam.Width = 150;
+            // 
+            // testValue
+            // 
+            this.testValue.FillWeight = 150F;
+            this.testValue.HeaderText = "值";
+            this.testValue.Name = "testValue";
+            this.testValue.ReadOnly = true;
+            this.testValue.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // testUnit
+            // 
+            this.testUnit.HeaderText = "单位";
+            this.testUnit.Name = "testUnit";
+            this.testUnit.ReadOnly = true;
+            this.testUnit.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // groupBox1
             // 
@@ -256,7 +293,7 @@
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox1.Location = new System.Drawing.Point(3, 3);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(301, 183);
+            this.groupBox1.Size = new System.Drawing.Size(301, 192);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "传感器参数:";
@@ -270,14 +307,14 @@
             this.sensorParamsGrid.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.sensorParamsGrid.BackgroundColor = System.Drawing.Color.White;
             this.sensorParamsGrid.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.sensorParamsGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.sensorParamsGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.sensorParamsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.sensorParamsGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.sensorParam,
@@ -288,30 +325,124 @@
             this.sensorParamsGrid.MultiSelect = false;
             this.sensorParamsGrid.Name = "sensorParamsGrid";
             this.sensorParamsGrid.ReadOnly = true;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.sensorParamsGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.sensorParamsGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle2;
             this.sensorParamsGrid.RowHeadersVisible = false;
             this.sensorParamsGrid.RowTemplate.Height = 23;
             this.sensorParamsGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.sensorParamsGrid.Size = new System.Drawing.Size(295, 163);
+            this.sensorParamsGrid.Size = new System.Drawing.Size(295, 172);
             this.sensorParamsGrid.TabIndex = 1;
             this.sensorParamsGrid.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sensorParamsGrid_MouseUp);
             // 
+            // sensorParam
+            // 
+            this.sensorParam.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.sensorParam.HeaderText = "参数";
+            this.sensorParam.Name = "sensorParam";
+            this.sensorParam.ReadOnly = true;
+            this.sensorParam.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.sensorParam.Width = 150;
+            // 
+            // sensorValue
+            // 
+            this.sensorValue.FillWeight = 150F;
+            this.sensorValue.HeaderText = "值";
+            this.sensorValue.Name = "sensorValue";
+            this.sensorValue.ReadOnly = true;
+            this.sensorValue.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // sensorUnit
+            // 
+            this.sensorUnit.HeaderText = "单位";
+            this.sensorUnit.Name = "sensorUnit";
+            this.sensorUnit.ReadOnly = true;
+            this.sensorUnit.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.labelInnerPressure);
+            this.groupBox2.Controls.Add(this.labelSourcePressure);
+            this.groupBox2.Controls.Add(this.labelCurrentTime);
+            this.groupBox2.Controls.Add(this.labelTotleTime);
+            this.groupBox2.Controls.Add(this.labelChannelCount);
+            this.groupBox2.Controls.Add(this.labelCycleCount);
+            this.groupBox2.Controls.Add(this.labelState);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox2.Location = new System.Drawing.Point(3, 417);
+            this.groupBox2.Location = new System.Drawing.Point(3, 413);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(301, 123);
+            this.groupBox2.Size = new System.Drawing.Size(301, 186);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "当前状态:";
+            // 
+            // labelInnerPressure
+            // 
+            this.labelInnerPressure.AutoSize = true;
+            this.labelInnerPressure.Location = new System.Drawing.Point(10, 137);
+            this.labelInnerPressure.Name = "labelInnerPressure";
+            this.labelInnerPressure.Size = new System.Drawing.Size(107, 12);
+            this.labelInnerPressure.TabIndex = 6;
+            this.labelInnerPressure.Text = "传感器工装内压力:";
+            // 
+            // labelSourcePressure
+            // 
+            this.labelSourcePressure.AutoSize = true;
+            this.labelSourcePressure.Location = new System.Drawing.Point(10, 118);
+            this.labelSourcePressure.Name = "labelSourcePressure";
+            this.labelSourcePressure.Size = new System.Drawing.Size(59, 12);
+            this.labelSourcePressure.TabIndex = 5;
+            this.labelSourcePressure.Text = "气源压力:";
+            // 
+            // labelCurrentTime
+            // 
+            this.labelCurrentTime.AutoSize = true;
+            this.labelCurrentTime.Location = new System.Drawing.Point(10, 98);
+            this.labelCurrentTime.Name = "labelCurrentTime";
+            this.labelCurrentTime.Size = new System.Drawing.Size(83, 12);
+            this.labelCurrentTime.TabIndex = 4;
+            this.labelCurrentTime.Text = "当前周期历时:";
+            // 
+            // labelTotleTime
+            // 
+            this.labelTotleTime.AutoSize = true;
+            this.labelTotleTime.Location = new System.Drawing.Point(10, 78);
+            this.labelTotleTime.Name = "labelTotleTime";
+            this.labelTotleTime.Size = new System.Drawing.Size(47, 12);
+            this.labelTotleTime.TabIndex = 3;
+            this.labelTotleTime.Text = "总历时:";
+            // 
+            // labelChannelCount
+            // 
+            this.labelChannelCount.AutoSize = true;
+            this.labelChannelCount.Location = new System.Drawing.Point(10, 59);
+            this.labelChannelCount.Name = "labelChannelCount";
+            this.labelChannelCount.Size = new System.Drawing.Size(107, 12);
+            this.labelChannelCount.TabIndex = 2;
+            this.labelChannelCount.Text = "正在测量的通道数:";
+            // 
+            // labelCycleCount
+            // 
+            this.labelCycleCount.AutoSize = true;
+            this.labelCycleCount.Location = new System.Drawing.Point(10, 39);
+            this.labelCycleCount.Name = "labelCycleCount";
+            this.labelCycleCount.Size = new System.Drawing.Size(107, 12);
+            this.labelCycleCount.TabIndex = 1;
+            this.labelCycleCount.Text = "正在进行的周期数:";
+            // 
+            // labelState
+            // 
+            this.labelState.AutoSize = true;
+            this.labelState.Location = new System.Drawing.Point(10, 20);
+            this.labelState.Name = "labelState";
+            this.labelState.Size = new System.Drawing.Size(95, 12);
+            this.labelState.TabIndex = 0;
+            this.labelState.Text = "当前试验的状态:";
             // 
             // groupBox3
             // 
@@ -319,7 +450,7 @@
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox3.Location = new System.Drawing.Point(0, 0);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(718, 543);
+            this.groupBox3.Size = new System.Drawing.Size(718, 602);
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "通道列表:";
@@ -350,57 +481,9 @@
             this.channelsCrid.RowHeadersVisible = false;
             this.channelsCrid.RowTemplate.Height = 23;
             this.channelsCrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.channelsCrid.Size = new System.Drawing.Size(712, 523);
+            this.channelsCrid.Size = new System.Drawing.Size(712, 582);
             this.channelsCrid.TabIndex = 0;
             this.channelsCrid.MouseUp += new System.Windows.Forms.MouseEventHandler(this.channelsCrid_MouseUp);
-            // 
-            // testParam
-            // 
-            this.testParam.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.testParam.HeaderText = "参数";
-            this.testParam.Name = "testParam";
-            this.testParam.ReadOnly = true;
-            this.testParam.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.testParam.Width = 150;
-            // 
-            // testValue
-            // 
-            this.testValue.FillWeight = 150F;
-            this.testValue.HeaderText = "值";
-            this.testValue.Name = "testValue";
-            this.testValue.ReadOnly = true;
-            this.testValue.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // testUnit
-            // 
-            this.testUnit.HeaderText = "单位";
-            this.testUnit.Name = "testUnit";
-            this.testUnit.ReadOnly = true;
-            this.testUnit.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // sensorParam
-            // 
-            this.sensorParam.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.sensorParam.HeaderText = "参数";
-            this.sensorParam.Name = "sensorParam";
-            this.sensorParam.ReadOnly = true;
-            this.sensorParam.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.sensorParam.Width = 150;
-            // 
-            // sensorValue
-            // 
-            this.sensorValue.FillWeight = 150F;
-            this.sensorValue.HeaderText = "值";
-            this.sensorValue.Name = "sensorValue";
-            this.sensorValue.ReadOnly = true;
-            this.sensorValue.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // sensorUnit
-            // 
-            this.sensorUnit.HeaderText = "单位";
-            this.sensorUnit.Name = "sensorUnit";
-            this.sensorUnit.ReadOnly = true;
-            this.sensorUnit.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // channelCol
             // 
@@ -455,7 +538,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1029, 633);
+            this.ClientSize = new System.Drawing.Size(1029, 692);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.statusStrip1);
@@ -463,6 +546,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "FormMain";
             this.Text = "Sensor";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -476,6 +560,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.testParamsGrid)).EndInit();
             this.groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.sensorParamsGrid)).EndInit();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.channelsCrid)).EndInit();
             this.ResumeLayout(false);
@@ -518,6 +604,13 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn resultCol;
         private System.Windows.Forms.DataGridViewTextBoxColumn stateCol;
         private System.Windows.Forms.DataGridViewCheckBoxColumn enableCol;
+        private System.Windows.Forms.Label labelTotleTime;
+        private System.Windows.Forms.Label labelChannelCount;
+        private System.Windows.Forms.Label labelCycleCount;
+        private System.Windows.Forms.Label labelState;
+        private System.Windows.Forms.Label labelCurrentTime;
+        private System.Windows.Forms.Label labelInnerPressure;
+        private System.Windows.Forms.Label labelSourcePressure;
     }
 }
 
