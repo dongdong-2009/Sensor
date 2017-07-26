@@ -30,11 +30,30 @@
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.sensorParamsGrid = new System.Windows.Forms.DataGridView();
+            this.sensorParam = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.sensorValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.sensorUnit = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.testParamsGrid = new System.Windows.Forms.DataGridView();
+            this.testParam = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.testValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.testUnit = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.button4 = new System.Windows.Forms.Button();
+            this.channelsGrid = new System.Windows.Forms.DataGridView();
+            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.stepText = new System.Windows.Forms.TextBox();
+            this.Lable4 = new System.Windows.Forms.Label();
+            this.startText = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.prefixText = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
@@ -119,38 +138,19 @@
             this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.groupBox6 = new System.Windows.Forms.GroupBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.prefixText = new System.Windows.Forms.TextBox();
-            this.startText = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.stepText = new System.Windows.Forms.TextBox();
-            this.Lable4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
-            this.channelsGrid = new System.Windows.Forms.DataGridView();
-            this.button4 = new System.Windows.Forms.Button();
-            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.testParam = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.testValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.testUnit = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.sensorParam = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.sensorValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.sensorUnit = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.sensorParamsGrid)).BeginInit();
             this.groupBox4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.testParamsGrid)).BeginInit();
             this.groupBox2.SuspendLayout();
+            this.groupBox6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.channelsGrid)).BeginInit();
             this.groupBox3.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
-            this.groupBox6.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.channelsGrid)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -181,6 +181,26 @@
             this.sensorParamsGrid.RowTemplate.Height = 23;
             this.sensorParamsGrid.Size = new System.Drawing.Size(449, 197);
             this.sensorParamsGrid.TabIndex = 2;
+            this.sensorParamsGrid.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.sensorParamsGrid_CellEndEdit);
+            // 
+            // sensorParam
+            // 
+            this.sensorParam.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.sensorParam.HeaderText = "参数";
+            this.sensorParam.Name = "sensorParam";
+            this.sensorParam.ReadOnly = true;
+            this.sensorParam.Width = 200;
+            // 
+            // sensorValue
+            // 
+            this.sensorValue.HeaderText = "值";
+            this.sensorValue.Name = "sensorValue";
+            // 
+            // sensorUnit
+            // 
+            this.sensorUnit.HeaderText = "单位";
+            this.sensorUnit.Name = "sensorUnit";
+            this.sensorUnit.ReadOnly = true;
             // 
             // groupBox4
             // 
@@ -210,6 +230,26 @@
             this.testParamsGrid.RowTemplate.Height = 23;
             this.testParamsGrid.Size = new System.Drawing.Size(449, 230);
             this.testParamsGrid.TabIndex = 2;
+            this.testParamsGrid.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.testParamsGrid_CellContentClick);
+            // 
+            // testParam
+            // 
+            this.testParam.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.testParam.HeaderText = "参数";
+            this.testParam.Name = "testParam";
+            this.testParam.ReadOnly = true;
+            this.testParam.Width = 200;
+            // 
+            // testValue
+            // 
+            this.testValue.HeaderText = "值";
+            this.testValue.Name = "testValue";
+            // 
+            // testUnit
+            // 
+            this.testUnit.HeaderText = "单位";
+            this.testUnit.Name = "testUnit";
+            this.testUnit.ReadOnly = true;
             // 
             // button1
             // 
@@ -241,6 +281,130 @@
             this.groupBox2.TabIndex = 7;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "端口配置:";
+            // 
+            // groupBox6
+            // 
+            this.groupBox6.Controls.Add(this.button4);
+            this.groupBox6.Controls.Add(this.channelsGrid);
+            this.groupBox6.Controls.Add(this.groupBox7);
+            this.groupBox6.Controls.Add(this.label5);
+            this.groupBox6.Controls.Add(this.stepText);
+            this.groupBox6.Controls.Add(this.Lable4);
+            this.groupBox6.Controls.Add(this.startText);
+            this.groupBox6.Controls.Add(this.label3);
+            this.groupBox6.Controls.Add(this.prefixText);
+            this.groupBox6.Controls.Add(this.label2);
+            this.groupBox6.Location = new System.Drawing.Point(15, 244);
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.Size = new System.Drawing.Size(367, 241);
+            this.groupBox6.TabIndex = 2;
+            this.groupBox6.TabStop = false;
+            this.groupBox6.Text = "生成传感器编号:";
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(244, 69);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(106, 23);
+            this.button4.TabIndex = 9;
+            this.button4.Text = "生成编号列表";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // channelsGrid
+            // 
+            this.channelsGrid.AllowUserToAddRows = false;
+            this.channelsGrid.AllowUserToDeleteRows = false;
+            this.channelsGrid.AllowUserToResizeRows = false;
+            this.channelsGrid.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.channelsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.channelsGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridViewTextBoxColumn1,
+            this.dataGridViewTextBoxColumn2});
+            this.channelsGrid.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.channelsGrid.Location = new System.Drawing.Point(3, 119);
+            this.channelsGrid.Name = "channelsGrid";
+            this.channelsGrid.RowHeadersVisible = false;
+            this.channelsGrid.RowTemplate.Height = 23;
+            this.channelsGrid.Size = new System.Drawing.Size(361, 119);
+            this.channelsGrid.TabIndex = 8;
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            this.dataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.dataGridViewTextBoxColumn1.HeaderText = "端口";
+            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            this.dataGridViewTextBoxColumn1.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            this.dataGridViewTextBoxColumn2.HeaderText = "传感器编号:";
+            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            // 
+            // groupBox7
+            // 
+            this.groupBox7.Location = new System.Drawing.Point(1, 91);
+            this.groupBox7.Name = "groupBox7";
+            this.groupBox7.Size = new System.Drawing.Size(363, 10);
+            this.groupBox7.TabIndex = 7;
+            this.groupBox7.TabStop = false;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(1, 104);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(113, 12);
+            this.label5.TabIndex = 6;
+            this.label5.Text = "预览|手动修改编号:";
+            // 
+            // stepText
+            // 
+            this.stepText.Location = new System.Drawing.Point(104, 69);
+            this.stepText.Name = "stepText";
+            this.stepText.Size = new System.Drawing.Size(72, 21);
+            this.stepText.TabIndex = 5;
+            // 
+            // Lable4
+            // 
+            this.Lable4.AutoSize = true;
+            this.Lable4.Location = new System.Drawing.Point(1, 74);
+            this.Lable4.Name = "Lable4";
+            this.Lable4.Size = new System.Drawing.Size(95, 12);
+            this.Lable4.TabIndex = 4;
+            this.Lable4.Text = "可变序列步进量:";
+            // 
+            // startText
+            // 
+            this.startText.Location = new System.Drawing.Point(253, 42);
+            this.startText.Name = "startText";
+            this.startText.Size = new System.Drawing.Size(95, 21);
+            this.startText.TabIndex = 3;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(1, 45);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(245, 12);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "可变序列起始值(前补0将作为保留位数输出):";
+            // 
+            // prefixText
+            // 
+            this.prefixText.Location = new System.Drawing.Point(174, 18);
+            this.prefixText.Name = "prefixText";
+            this.prefixText.Size = new System.Drawing.Size(174, 21);
+            this.prefixText.TabIndex = 1;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(1, 21);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(167, 12);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "固定字符,用#代替可变的序列:";
             // 
             // groupBox3
             // 
@@ -1186,90 +1350,6 @@
             this.checkBox1.Text = "checkBox1";
             this.checkBox1.UseVisualStyleBackColor = true;
             // 
-            // groupBox6
-            // 
-            this.groupBox6.Controls.Add(this.button4);
-            this.groupBox6.Controls.Add(this.channelsGrid);
-            this.groupBox6.Controls.Add(this.groupBox7);
-            this.groupBox6.Controls.Add(this.label5);
-            this.groupBox6.Controls.Add(this.stepText);
-            this.groupBox6.Controls.Add(this.Lable4);
-            this.groupBox6.Controls.Add(this.startText);
-            this.groupBox6.Controls.Add(this.label3);
-            this.groupBox6.Controls.Add(this.prefixText);
-            this.groupBox6.Controls.Add(this.label2);
-            this.groupBox6.Location = new System.Drawing.Point(15, 244);
-            this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(367, 241);
-            this.groupBox6.TabIndex = 2;
-            this.groupBox6.TabStop = false;
-            this.groupBox6.Text = "生成传感器编号:";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(1, 21);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(167, 12);
-            this.label2.TabIndex = 0;
-            this.label2.Text = "固定字符,用#代替可变的序列:";
-            // 
-            // prefixText
-            // 
-            this.prefixText.Location = new System.Drawing.Point(174, 18);
-            this.prefixText.Name = "prefixText";
-            this.prefixText.Size = new System.Drawing.Size(174, 21);
-            this.prefixText.TabIndex = 1;
-            // 
-            // startText
-            // 
-            this.startText.Location = new System.Drawing.Point(253, 42);
-            this.startText.Name = "startText";
-            this.startText.Size = new System.Drawing.Size(95, 21);
-            this.startText.TabIndex = 3;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(1, 45);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(245, 12);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "可变序列起始值(前补0将作为保留位数输出):";
-            // 
-            // stepText
-            // 
-            this.stepText.Location = new System.Drawing.Point(104, 69);
-            this.stepText.Name = "stepText";
-            this.stepText.Size = new System.Drawing.Size(72, 21);
-            this.stepText.TabIndex = 5;
-            // 
-            // Lable4
-            // 
-            this.Lable4.AutoSize = true;
-            this.Lable4.Location = new System.Drawing.Point(1, 74);
-            this.Lable4.Name = "Lable4";
-            this.Lable4.Size = new System.Drawing.Size(95, 12);
-            this.Lable4.TabIndex = 4;
-            this.Lable4.Text = "可变序列步进量:";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(1, 104);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(113, 12);
-            this.label5.TabIndex = 6;
-            this.label5.Text = "预览|手动修改编号:";
-            // 
-            // groupBox7
-            // 
-            this.groupBox7.Location = new System.Drawing.Point(1, 91);
-            this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(363, 10);
-            this.groupBox7.TabIndex = 7;
-            this.groupBox7.TabStop = false;
-            // 
             // groupBox8
             // 
             this.groupBox8.Location = new System.Drawing.Point(12, 509);
@@ -1277,84 +1357,6 @@
             this.groupBox8.Size = new System.Drawing.Size(847, 10);
             this.groupBox8.TabIndex = 8;
             this.groupBox8.TabStop = false;
-            // 
-            // channelsGrid
-            // 
-            this.channelsGrid.AllowUserToAddRows = false;
-            this.channelsGrid.AllowUserToDeleteRows = false;
-            this.channelsGrid.AllowUserToResizeRows = false;
-            this.channelsGrid.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.channelsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.channelsGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.dataGridViewTextBoxColumn1,
-            this.dataGridViewTextBoxColumn2});
-            this.channelsGrid.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.channelsGrid.Location = new System.Drawing.Point(3, 119);
-            this.channelsGrid.Name = "channelsGrid";
-            this.channelsGrid.RowHeadersVisible = false;
-            this.channelsGrid.RowTemplate.Height = 23;
-            this.channelsGrid.Size = new System.Drawing.Size(361, 119);
-            this.channelsGrid.TabIndex = 8;
-            // 
-            // button4
-            // 
-            this.button4.Location = new System.Drawing.Point(244, 69);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(106, 23);
-            this.button4.TabIndex = 9;
-            this.button4.Text = "生成编号列表";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
-            // 
-            // dataGridViewTextBoxColumn1
-            // 
-            this.dataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.dataGridViewTextBoxColumn1.HeaderText = "端口";
-            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-            this.dataGridViewTextBoxColumn1.ReadOnly = true;
-            // 
-            // dataGridViewTextBoxColumn2
-            // 
-            this.dataGridViewTextBoxColumn2.HeaderText = "传感器编号:";
-            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
-            // 
-            // testParam
-            // 
-            this.testParam.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.testParam.HeaderText = "参数";
-            this.testParam.Name = "testParam";
-            this.testParam.ReadOnly = true;
-            this.testParam.Width = 200;
-            // 
-            // testValue
-            // 
-            this.testValue.HeaderText = "值";
-            this.testValue.Name = "testValue";
-            // 
-            // testUnit
-            // 
-            this.testUnit.HeaderText = "单位";
-            this.testUnit.Name = "testUnit";
-            this.testUnit.ReadOnly = true;
-            // 
-            // sensorParam
-            // 
-            this.sensorParam.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.sensorParam.HeaderText = "参数";
-            this.sensorParam.Name = "sensorParam";
-            this.sensorParam.ReadOnly = true;
-            this.sensorParam.Width = 200;
-            // 
-            // sensorValue
-            // 
-            this.sensorValue.HeaderText = "值";
-            this.sensorValue.Name = "sensorValue";
-            // 
-            // sensorUnit
-            // 
-            this.sensorUnit.HeaderText = "单位";
-            this.sensorUnit.Name = "sensorUnit";
-            this.sensorUnit.ReadOnly = true;
             // 
             // FormConfig
             // 
@@ -1376,6 +1378,9 @@
             this.groupBox4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.testParamsGrid)).EndInit();
             this.groupBox2.ResumeLayout(false);
+            this.groupBox6.ResumeLayout(false);
+            this.groupBox6.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.channelsGrid)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.tableLayoutPanel4.ResumeLayout(false);
@@ -1386,9 +1391,6 @@
             this.tableLayoutPanel3.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
-            this.groupBox6.ResumeLayout(false);
-            this.groupBox6.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.channelsGrid)).EndInit();
             this.ResumeLayout(false);
 
         }

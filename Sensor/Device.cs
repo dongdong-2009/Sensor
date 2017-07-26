@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
+using static Sensor.FormMain;
 
 namespace Sensor
 {
@@ -42,7 +44,7 @@ namespace Sensor
         GET_TEMPERATURE_CALIBRATED = 'j',
         SET_THERMOMETER_CP = 'k',
         GET_PRESSURE = 'l',
-        GET_PRESSURE_CALIBRATED = 'm',
+        GET_PRESSURE_CALIBRATED = 'm',  
         SET_PRESSURE_GAUGE_CP = 'n',
         SET_DOUT_STA = 'o',
         GET_DIN_STA = 'p',
@@ -67,17 +69,41 @@ namespace Sensor
    
     class Device
     {
+        Mutex mut = new Mutex();
+        ComPort ser = null;
 
-        ComPort ser = new ComPort();
-        private FormMain formMain;
-
-        public Device(FormMain formMain)
+        public bool Connect()
         {
-            this.formMain = formMain;
+            mut.WaitOne();
+            ser = new ComPort();
             ser.Baudrate = 115200;
+            ser.Close();
             if (ser.Open(1) == false)
             {
-                MessageBox.Show(formMain, "无效的串口");
+                ser.Close();
+                ser = null;
+                mut.ReleaseMutex();
+                return false;
+            }
+            mut.ReleaseMutex();
+            return true;
+        }
+        public void Disconnect()
+        {
+            mut.WaitOne();
+            if (ser != null)
+            {
+                ser.Close();
+                ser = null;
+            }
+            mut.ReleaseMutex();
+        }
+        ~Device()
+        {
+            if (ser!=null)
+            {
+                ser.Close();
+                ser = null;
             }
         }
 
@@ -89,8 +115,16 @@ namespace Sensor
         /// <param name="devCh">通道</param>
         /// <param name="data">数据</param>
         /// <returns>返回接受到的结果</returns>
-        public string commad(DevAddress devAddr, DevFunction devFunc, DevChannel devCh, string data)
+        public string command(DevAddress devAddr, DevFunction devFunc, DevChannel devCh, string data)
         {
+            {
+                return "1000";
+            }
+            if (ser == null)
+            {
+                throw new Exception("内部错误,无效的串口对象");
+            }
+            mut.WaitOne();
             ser.Recive(1024, 1);    //clear rbuffer
             string cmdstr = String.Format("+{0}{1}{2}{3}{4}-", 
                 data.Length, 
@@ -118,12 +152,14 @@ namespace Sensor
                     string end = resstr.Substring(n + 5 + len, 1);      //检查结尾字符
                     if (end != "*")
                         throw new Exception();
+                    mut.ReleaseMutex();
                     return res;                 //成功返回
                 }
                 catch {
                     continue;
                 }
             }
+            mut.ReleaseMutex();
             throw new Exception("Device send command, but recive error, cmd: " + cmdstr);
         }
 
@@ -131,38 +167,75 @@ namespace Sensor
         {
             for (DevAddress devAddr = DevAddress.SWITCH_BOARD_0; devAddr <= DevAddress.SWITCH_BOARD_9; devAddr++)
             {
-                commad(devAddr, DevFunction.SET_SWITCH_CHANNEL, DevChannel.CH_ALL, "0");
+                command(devAddr, DevFunction.SET_SWITCH_CHANNEL, DevChannel.CH_ALL, "0");
             }
         }
 
         internal void enablePressure()
         {
-            commad(DevAddress.DOUT_ONBOARD, DevFunction.SET_DOUT_STA, DevChannel.CH_NONE, "1");
+            command(DevAddress.DOUT_ONBOARD, DevFunction.SET_DOUT_STA, DevChannel.CH_NONE, "1");
         }
         internal void disablePressure()
         {
-            commad(DevAddress.DOUT_ONBOARD, DevFunction.SET_DOUT_STA, DevChannel.CH_NONE, "0");
+            command(DevAddress.DOUT_ONBOARD, DevFunction.SET_DOUT_STA, DevChannel.CH_NONE, "0");
         }
         internal void setPowerVoltage(double volt)
         {
             string s = String.Format("{0:D4}", (int)(volt*100));   //12.00f -> 1200
-            commad(DevAddress.POWER_SUPPLY, DevFunction.SET_POWER_SUPPLY_VOLTAGE, DevChannel.CH_NONE, s);
+            command(DevAddress.POWER_SUPPLY, DevFunction.SET_POWER_SUPPLY_VOLTAGE, DevChannel.CH_NONE, s);
         }
 
         internal void selectSlotChannel(int slot, int ch)
         {
-            commad(DevAddress.SWITCH_BOARD_0 + slot, DevFunction.SET_SWITCH_CHANNEL, DevChannel.CH0 + ch, "1");
+            command(DevAddress.SWITCH_BOARD_0 + slot, DevFunction.SET_SWITCH_CHANNEL, DevChannel.CH0 + ch, "1");
         }
 
         internal double getTestVoltage()
         {
-            string res = commad(DevAddress.VOLTMETER, DevFunction.SET_DOUT_STA, DevChannel.CH_NONE, "1");
+            string res = command(DevAddress.VOLTMETER, DevFunction.SET_DOUT_STA, DevChannel.CH_NONE, "1");
             return (double.Parse(res)/100);     //1200 -> 12.00f
         }
 
         internal void closeSlotChannel(int slot, int ch)
         {
-            commad(DevAddress.SWITCH_BOARD_0 + slot, DevFunction.SET_SWITCH_CHANNEL, DevChannel.CH0 + ch, "0");
+            command(DevAddress.SWITCH_BOARD_0 + slot, DevFunction.SET_SWITCH_CHANNEL, DevChannel.CH0 + ch, "0");
+        }
+
+        internal double getSourcePressure()
+        {
+            string res = command(DevAddress.PRESSURE_GAUGE, DevFunction.GET_PRESSURE_CALIBRATED, DevChannel.CH0, "");
+            return (double.Parse(res) / 1000);     //1000 -> 1.000f
+        }
+
+        internal double getInnerPressure()
+        {
+            string res = command(DevAddress.PRESSURE_GAUGE, DevFunction.GET_PRESSURE_CALIBRATED, DevChannel.CH1, "");
+            return (double.Parse(res) / 1000);     //1000 -> 1.000f
+        }
+        internal bool findSlot(int v)
+        {
+            try
+            {
+                string res = command(DevAddress.SWITCH_BOARD_0 + v, DevFunction.ACK, DevChannel.CH_NONE, "");
+                if (res == "")  //只有回应正确,并且无数据为ok
+                    return true;
+            }
+            catch
+            {
+                //超时或收到不对
+            }
+            return false;
+        }
+
+        internal void pause()
+        {
+            mut.WaitOne();
+
+        }
+
+        internal void resume()
+        {
+            mut.ReleaseMutex();
         }
 
 

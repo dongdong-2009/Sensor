@@ -28,11 +28,8 @@ public class Config : INIConfig
 
 
     public class Section_测试参数 { 
-
-        public double 传感器压力测量范围最小值 = -1000.000;
-        public double 传感器压力测量范围最大值 = 1000.000;
-        public double 传感器供电电压 = 12.00;
         public int 老化周期数 = 1;
+        public string rem_传感器精度 = "传感精度设置不加百分号, 如0.01代表1%. 范围从0.001 到 10.000";
         public double 传感器精度 = 0.01;
         public double 充气高压压力 = 1000.000;
         public int 充气高压时间 = 1;

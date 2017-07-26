@@ -34,6 +34,8 @@ namespace Sensor
             }
             public string getValue()
             {
+                if (unit.Trim() == "%")
+                    return (value * 100).ToString(fmt);
                 return value.ToString(fmt);
             }
             public double getValue2()
@@ -47,10 +49,36 @@ namespace Sensor
 
             internal void setValue(string v)
             {
-                value = Convert.ToDouble(v);
+                if (unit.Trim() == "%")
+                {
+                    value = Convert.ToDouble(v)/100.0;
+                }
+                else
+                {
+                    value = Convert.ToDouble(v);
+                }
+            }
+            internal void setValue(double v)
+            {
+                value = v;
+            }
+
+            internal string getFormat()
+            {
+                return fmt;
+            }
+
+            internal double getMin()
+            {
+                return min;
+            }
+            internal double getMax()
+            {
+                return max;
             }
         }
 
+        ParamDesc pressureParamDesc; //压力值用的格式化字符串和单位等描述用于测试时界面显示.
         public Dictionary<String, ParamDesc> sensorParamTable = new Dictionary<string, ParamDesc>();        //传感器参数表
         public Dictionary<String, ParamDesc> testParamTable = new Dictionary<string, ParamDesc>();          //测试参数表
         public bool[,] channelEnableTable = new bool[10, 5];        //通道使能表
@@ -80,23 +108,27 @@ namespace Sensor
                 channelsCrid[stateCol.Index, i].Value = "未知";
             }
 
+            LoadConfig();
+            UpdateDisp();
+
             //禁止选中
-            foreach (DataGridViewRow i in sensorParamsGrid.Rows){
+            foreach (DataGridViewRow i in channelsCrid.Rows)
+            {
+                i.Selected = false;
+            }
+            foreach (DataGridViewRow i in sensorParamsGrid.Rows)
+            {
                 i.Selected = false;
             }
             foreach (DataGridViewRow i in testParamsGrid.Rows)
             {
                 i.Selected = false;
             }
-            foreach (DataGridViewRow i in channelsCrid.Rows)
-            {
-                i.Selected = false;
-            }
-
-            LoadConfig();
-            UpdateDisp();
 
         }
+        
+
+
         private void LoadConfig()
         {
             config = new Config();
@@ -107,18 +139,21 @@ namespace Sensor
             sensorParamTable.Add("传感器量程最大值", new ParamDesc(config.传感器参数.传感器量程最大值, "0.000", "Mpa", -1000.000f, 1000.000f, 0.001));
             sensorParamTable.Add("传感器输出电压最小值", new ParamDesc(config.传感器参数.传感器输出电压最小值, "0.00", "V", 0.01, 12.00, 0.01));
             sensorParamTable.Add("传感器输出电压最大值", new ParamDesc(config.传感器参数.传感器输出电压最大值, "0.00", "V", 0.01, 12.00, 0.01));
-            sensorParamTable.Add("传感器精度", new ParamDesc(config.传感器参数.传感器精度, "0.00", "%", 0.01, 10.00, 0.01));
+            sensorParamTable.Add("传感器精度", new ParamDesc(config.传感器参数.传感器精度, "0.00", "%", 0.001, 10.000, 0.001));
             sensorParamTable.Add("传感器供电电压", new ParamDesc(config.传感器参数.传感器供电电压, "0.00", "V", 0.01, 12.00, 0.01));
 
             //测试参数
-            testParamTable.Add("传感器压力测量范围最小值", new ParamDesc(config.测试参数.传感器压力测量范围最小值, "0.000", "Mpa", -1000.000f, 1000.000f, 0.001));      //步进多少
-            testParamTable.Add("传感器压力测量范围最大值", new ParamDesc(config.测试参数.传感器压力测量范围最大值, "0.000", "Mpa", -1000.000f, 1000.000f, 0.001));
-            testParamTable.Add("传感器供电电压", new ParamDesc(config.测试参数.传感器供电电压, "0.00", "V", 0.01, 12.00, 0.01));               //范围不进
             testParamTable.Add("老化周期数", new ParamDesc(config.测试参数.老化周期数, "", "次", 1, 10000, 1));
             testParamTable.Add("充气(高压)压力", new ParamDesc(config.测试参数.充气高压压力, "0.000", "Mpa", -1000.000f, 1000.000f, 0.001));
             testParamTable.Add("充气(高压)时间", new ParamDesc(config.测试参数.充气高压时间, "", "秒", 1, 200, 1));
             testParamTable.Add("排气(静置)时间", new ParamDesc(config.测试参数.排气静置时间, "", "秒", 1, 200, 1));
 
+            pressureParamDesc = testParamTable["充气(高压)压力"];
+            if (pressureParamDesc == null)
+            {
+                MessageBox.Show("程序故障!");
+                Application.Exit();
+            }
 
             //传感器编号
             string s = config.设备参数.设备标签.Trim();
@@ -141,7 +176,7 @@ namespace Sensor
                     {
                         try
                         {
-                            if (int.Parse(ss[i]) == (slot * 10 + ch))
+                            if (int.Parse(ss[i]) == (slot * 5 + ch))
                                 channelEnableTable[slot, ch] = false;
                         }
                         catch { }
@@ -159,9 +194,6 @@ namespace Sensor
             config.传感器参数.传感器精度 = sensorParamTable["传感器精度"].getValue2();
             config.传感器参数.传感器供电电压 = sensorParamTable["传感器供电电压"].getValue2();
 
-            config.测试参数.传感器压力测量范围最小值 = testParamTable["传感器压力测量范围最小值"].getValue2();
-            config.测试参数.传感器压力测量范围最大值 = testParamTable["传感器压力测量范围最大值"].getValue2();
-            config.测试参数.传感器供电电压 = testParamTable["传感器供电电压"].getValue2();
             config.测试参数.老化周期数 = (int)testParamTable["老化周期数"].getValue2();
             config.测试参数.充气高压压力 = testParamTable["充气(高压)压力"].getValue2();
             config.测试参数.充气高压时间 = (int)testParamTable["充气(高压)时间"].getValue2();
@@ -174,7 +206,7 @@ namespace Sensor
                 {
                     if (channelEnableTable[slot, ch] == false)
                     {
-                        config.设备参数.禁用的通道 += "" + (slot * 10 + ch) + ",";
+                        config.设备参数.禁用的通道 += "" + (slot * 5 + ch) + ",";
                     }
                 }
             }
@@ -286,11 +318,6 @@ namespace Sensor
             }
         }
 
-        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            config.SaveIniFile();
-            config = null;
-        }
 
         private void 导出配置文件ToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -306,75 +333,490 @@ namespace Sensor
                 }
             }
         }
-        volatile bool runFlag =true;
+        public enum TestEvent {
+            /*
+             * 用末尾的字符代表了参数的个数和类型例如
+             * XXX_ds  两个参数, 第一个为int, 第二个为string.
+             * c:char d:int, f:double, s:string o:class-object 
+             */
+            ShowMessageBox_s,           //显示消息框
+            ChannelsState,              //端口状态监测
+            TestBegain,                  //测试开始
+            TestEnd,                    //测试完成
+            TestAbort,                    //测试中断
+            CycleBegain,                //一个周期开始
+            CurrentCycleCount_d,        //当前测试周期
+            CurrentTestState_s,         //当前测试状态,排气,充气
+            CurrentTestSlotChannel_dd,   //当前测试通道
+            TestTotleTime,              //总时间
+            TestCurrentTime,            //当前周期历时
+            LowPressureVal_ddfff,          //传感器低压信息,参数:插槽,通道,传感器输出电压值,气源压力值,工装内压力值
+            HighPressureVal_ddfff,          //传感器高压信息,同上
+            EndChannelTest_dd,                 //完成一个通道的高低压测试.
+        }
+        volatile bool runFlag = false;
         Thread testThread = null;
-        Device dev = null;
-        void testProc()
+        Device device = null;
+        int timeBegainTest = 0;
+        int timeBegainCycle = 0;
+        private void timer1_Tick(object sender, EventArgs e)
         {
-            dev = new Device(this);
-            while (runFlag)
+            if (runFlag)
             {
-                try
+                if(timeBegainTest>0)
                 {
-                    dev.closeAllChannel();
-                    dev.setPowerVoltage(config.传感器参数.传感器供电电压);
-                    dev.enablePressure();
-                    Thread.Sleep(500);
-                    for (int slot = 0; slot < 10; slot++)
-                    {
-                        for (int ch = 0; ch < 5; ch++)
-                        {
-                            if (runFlag == false)
-                                goto end;
-                            dev.selectSlotChannel(slot, ch);
-                            Thread.Sleep(200);
-                            double v = dev.getTestVoltage();
-
-                            if(ch==4)
-                                dev.closeSlotChannel(slot,ch);  //最後一個通道是需要關閉的.
-                        }
-                        
-                    }
-                    dev.disablePressure();
-                    Thread.Sleep(500);
-                    for (int slot = 0; slot < 10; slot++)
-                    {
-                        for (int ch = 0; ch < 5; ch++)
-                        {
-                            if (runFlag == false)
-                                goto end;
-                            dev.selectSlotChannel(slot, ch);
-                            Thread.Sleep(200);
-                            double v = dev.getTestVoltage();
-
-                            if (ch == 4)
-                                dev.closeSlotChannel(slot, ch);  //最後一個通道是需要關閉的.
-                        }
-
-                    }
-                end:;
+                    int s = (System.Environment.TickCount - timeBegainTest)/1000;
+                    int hh = s / 3600;
+                    int mm = s % 3600 / 60;
+                    int ss = s % 60;
+                    labelTotleTime.Text = String.Format("总历时: {0}:{1}:{2}", hh, mm, ss);
                 }
-                catch (Exception e)
+                if(timeBegainCycle>0)
                 {
-                    MessageBox.Show(e.Message);
-                    runFlag = false;
+                    int s = (System.Environment.TickCount - timeBegainCycle)/1000;
+                    int hh = s / 3600;
+                    int mm = s % 3600 / 60;
+                    int ss = s % 60;
+                    labelCurrentTime.Text = String.Format("当前周期历时: {0}:{1}:{2}", hh, mm, ss);
                 }
             }
         }
+        public delegate void d_SendTestEvent(TestEvent e, params object[] p);
+        public void SendTestEvent(TestEvent e, params object[] p)
+        {
+            if (InvokeRequired)
+            {
+                d_SendTestEvent d = new d_SendTestEvent(SendTestEvent);
+                Invoke(d, e, p);
+            }
+            else
+            {
+                switch (e) {
+                    case TestEvent.ShowMessageBox_s:
+                        MessageBox.Show(this, p[0].ToString());
+                        break;
+                    case TestEvent.TestBegain:
+                        startBtn.Enabled = false;
+                        pauseBtn.Enabled = true;
+                        stopBtn.Enabled = true;
+                        configBtn.Enabled = false;
+                        findBtn.Enabled = false;
+                        for (int i = 0; i < 50; i++)
+                        {
+                            channelsCrid[highValueCol.Index, i].Value = "";
+                            channelsCrid[lowValueCol.Index, i].Value = "";
+                            channelsCrid[resultCol.Index, i].Value = "";
+                        }
+                        timeBegainTest = System.Environment.TickCount;
+                        break;
+                    case TestEvent.TestEnd:
+                        startBtn.Enabled = true;
+                        pauseBtn.Enabled = false;
+                        stopBtn.Enabled = false;
+                        configBtn.Enabled = true;
+                        findBtn.Enabled = true;
+
+                        timeBegainTest = 0;
+                        timeBegainCycle = 0;
+                        break;
+                    case TestEvent.TestAbort:
+                        startBtn.Enabled = true;
+                        pauseBtn.Enabled = false;
+                        stopBtn.Enabled = false;
+                        configBtn.Enabled = true;
+                        findBtn.Enabled = true;
+
+                        timeBegainTest = 0;
+                        timeBegainCycle = 0;
+                        break;
+                    case TestEvent.CycleBegain:
+                        for (int i = 0; i < 50; i++)
+                        {
+                            channelsCrid[highValueCol.Index, i].Value = "";
+                            channelsCrid[lowValueCol.Index, i].Value = "";
+
+                            channelsCrid[highValueCol.Index, i].Style.BackColor = Color.White;
+                            channelsCrid[lowValueCol.Index, i].Style.BackColor = Color.White;
+                            channelsCrid[resultCol.Index, i].Style.BackColor = Color.White;
+
+                        }
+                        timeBegainCycle = System.Environment.TickCount;
+                        break;
+                    case TestEvent.CurrentCycleCount_d:
+                        labelCycleCount.Text = "正在进行的周期数: " + ((int)p[0] + 1);
+                        break;
+                    case TestEvent.CurrentTestState_s:
+                        labelState.Text = "当前实验的状态: " + ((string)p[0]);
+                        break;
+                    case TestEvent.CurrentTestSlotChannel_dd:
+                        {
+                            int slot = (int)p[0];
+                            int ch = (int)p[1];
+                            labelCurrentChannel.Text = String.Format("正在测量的通道: 第{0}插槽,第{1}通道", slot+1, ch+1);
+                            for (int i = 0; i < channelsCrid.RowCount; i++)
+                            {
+                                if (i == slot * 5 + ch)
+                                    channelsCrid.Rows[i].Selected = true;
+                                else
+                                    channelsCrid.Rows[i].Selected = false;
+                            }
+                            break;
+                        }
+                    case TestEvent.HighPressureVal_ddfff:
+                        {
+                            int slot = (int)p[0];
+                            int ch = (int)p[1];
+                            double sensor_volt = (double)p[2];
+                            double source_pressure = (double)p[3];
+                            double inner_pressure = (double)p[4];
+                            double sensor_pressure = calc_sensor_pres(sensor_volt);
+
+                            labelSourcePressure.Text = "气源压力: " +
+                                source_pressure.ToString(pressureParamDesc.getFormat()) + " " + pressureParamDesc.getUnit();
+                            labelInnerPressure.Text = "传感器工装内压力: " +
+                                inner_pressure.ToString(pressureParamDesc.getFormat()) + " " + pressureParamDesc.getUnit();
+                            string s = sensor_pressure.ToString(pressureParamDesc.getFormat());
+                            channelsCrid[highValueCol.Index, slot * 5 + ch].Value = s;
+                            channelsCrid[lowValueCol.Index, slot * 5 + ch].Selected = true;
+
+                            //测试结果
+                            double highval = 0.0;
+                            double.TryParse(channelsCrid[highValueCol.Index, slot * 5 + ch].Value.ToString(), out highval);
+                            double dlta = config.传感器参数.传感器精度 * (config.传感器参数.传感器量程最大值 - config.传感器参数.传感器量程最小值);
+                            double h_lval = config.测试参数.充气高压压力 - dlta;
+                            double h_rval = config.测试参数.充气高压压力 + dlta;
+                            bool hpass = true;
+                            if (highval < h_lval || highval > h_rval)
+                            {
+                                hpass = false;
+                                channelsCrid[highValueCol.Index, slot * 5 + ch].Style.BackColor = Color.Red;
+                            }
+                            if (hpass)
+                            {
+                                channelsCrid[resultCol.Index, slot * 5 + ch].Value = "PASS";
+                                channelsCrid[resultCol.Index, slot * 5 + ch].Style.BackColor = Color.Green;
+                            }
+                            else
+                            {
+                                channelsCrid[resultCol.Index, slot * 5 + ch].Value = "FALSE";
+                                channelsCrid[resultCol.Index, slot * 5 + ch].Style.BackColor = Color.Red;
+                                runFlag = false;
+                                foreach (DataGridViewRow i in channelsCrid.Rows)
+                                {
+                                    i.Selected = false;
+                                }
+                            }
+
+                            break;
+                        }
+                    case TestEvent.LowPressureVal_ddfff:
+                        {
+                            int slot = (int)p[0];
+                            int ch = (int)p[1];
+                            double sensor_volt = (double)p[2];
+                            double source_pressure = (double)p[3];
+                            double inner_pressure = (double)p[4];
+                            double sensor_pressure = calc_sensor_pres(sensor_volt);
+
+                            labelSourcePressure.Text = "气源压力: " + 
+                                source_pressure.ToString(pressureParamDesc.getFormat()) + " " + pressureParamDesc.getUnit();
+                            labelInnerPressure.Text = "传感器工装内压力: " +
+                                inner_pressure.ToString(pressureParamDesc.getFormat()) + " " + pressureParamDesc.getUnit();
+                            string s = sensor_pressure.ToString(pressureParamDesc.getFormat());
+                            channelsCrid[lowValueCol.Index, slot * 5 + ch].Value = s;
+                            channelsCrid[lowValueCol.Index, slot * 5 + ch].Selected = true;
+
+                            //测试结果
+                            double lowval = 0.0;
+                            double.TryParse(channelsCrid[lowValueCol.Index, slot * 5 + ch].Value.ToString(), out lowval);
+                            double dlta = config.传感器参数.传感器精度 * (config.传感器参数.传感器量程最大值 - config.传感器参数.传感器量程最小值);
+                            double l_lval = -dlta;
+                            double l_rval = dlta;
+                            bool lpass = true;
+                           
+                            if (lowval < l_lval || lowval > l_rval)
+                            {
+                                lpass = false;
+                                channelsCrid[lowValueCol.Index, slot * 5 + ch].Style.BackColor = Color.Red;
+                            }
+                            if (lpass)
+                            {
+                                channelsCrid[resultCol.Index, slot * 5 + ch].Value = "PASS";
+                                channelsCrid[resultCol.Index, slot * 5 + ch].Style.BackColor = Color.Green;
+                            }
+                            else
+                            {
+                                channelsCrid[resultCol.Index, slot * 5 + ch].Value = "FALSE";
+                                channelsCrid[resultCol.Index, slot * 5 + ch].Style.BackColor = Color.Red;
+                                foreach (DataGridViewRow i in channelsCrid.Rows)
+                                {
+                                    i.Selected = false;
+                                }
+                                runFlag = false;
+
+                            }
+                            
+                            break;
+                        }
+                    case TestEvent.EndChannelTest_dd:
+                        {/* //如果测完一轮充放气才报结果就这样
+                            int slot = (int)p[0];
+                            int ch = (int)p[1];
+                            double lowval = 0.0,highval=0.0;
+                            double.TryParse(channelsCrid[lowValueCol.Index, slot * 5 + ch].Value.ToString(), out lowval);
+                            double.TryParse(channelsCrid[highValueCol.Index, slot * 5 + ch].Value.ToString(), out highval);
+                            
+                            double dlta = config.传感器参数.传感器精度 * (config.传感器参数.传感器量程最大值 - config.传感器参数.传感器量程最小值);
+
+                            double h_lval = config.测试参数.充气高压压力 - dlta;
+                            double h_rval = config.测试参数.充气高压压力 + dlta;
+                            double l_lval = 0.0 * (1 - config.测试参数.传感器精度);
+                            double l_rval = 0.0 * (1 + config.测试参数.传感器精度);
+                            bool hpass=true, lpass=true;
+                            if (highval < h_lval || highval > h_rval)
+                            {
+                                hpass = false;
+                                channelsCrid[highValueCol.Index, slot * 5 + ch].Style.BackColor = Color.Red;
+                            }
+                            if (lowval < l_lval || lowval > l_rval)
+                            {
+                                lpass = false;
+                                channelsCrid[lowValueCol.Index, slot * 5 + ch].Style.BackColor = Color.Red;
+                            }
+                            if (hpass && lpass)
+                            {
+                                channelsCrid[resultCol.Index, slot * 5 + ch].Value = "PASS";
+                                channelsCrid[resultCol.Index, slot * 5 + ch].Style.BackColor = Color.Green;
+                            }
+                            else
+                            {
+                                channelsCrid[resultCol.Index, slot * 5 + ch].Value = "FALSE";
+                                channelsCrid[resultCol.Index, slot * 5 + ch].Style.BackColor = Color.Red;
+                                runFlag = false;
+                                foreach (DataGridViewRow i in channelsCrid.Rows)
+                                {
+                                    i.Selected = false;
+                                }
+                            }*/
+                        }
+                        break;
+                    default:
+                        break;
+
+                }
+            }
+        }
+
+        private double calc_sensor_pres(double sensor_volt)
+        {
+            double pleft = config.传感器参数.传感器量程最小值;
+            double pright = config.传感器参数.传感器输出电压最大值;
+            double pstep = (pright - pleft) * config.传感器参数.传感器精度 / 100.0;       //压力最小量
+            double vleft = config.传感器参数.传感器量程最小值;
+            double vright = config.传感器参数.传感器量程最大值;
+            double vstep = (vright - vleft) * config.传感器参数.传感器精度 / 100.0;       //电压最小量
+            double pres = ((sensor_volt - vleft) / vstep) * pstep + pleft;                //计算输出的压力值
+            return pres;
+        }
+
+        void testProc()
+        {
+            runFlag = true;
+            device = new Device();
+            int cycle_count=0;
+            try
+            {
+                if( device.Connect() == false)
+                    throw new Exception("无法连接到设备");
+                SendTestEvent(TestEvent.TestBegain);
+
+                for (cycle_count=0; cycle_count<config.测试参数.老化周期数 && runFlag; cycle_count++)
+                {
+
+                    SendTestEvent(TestEvent.CycleBegain);
+                    SendTestEvent(TestEvent.CurrentCycleCount_d, cycle_count);
+
+                    device.closeAllChannel();
+                    device.setPowerVoltage(config.传感器参数.传感器供电电压);
+                    device.enablePressure();
+                    SendTestEvent(TestEvent.CurrentTestState_s, "正在充气");
+                    Thread.Sleep(config.测试参数.排气静置时间 * 1000);
+                    for (int slot = 0; slot < 10 && runFlag; slot++)
+                    {
+                        for (int ch = 0; ch < 5; ch++)
+                        {
+                            if (channelsCrid[stateCol.Index, slot * 5 + ch].Value.ToString() == "空缺" ||
+                                (bool)(channelsCrid[enableCol.Index, slot * 5 + ch].Value) == false)
+                                continue;
+                            if (runFlag == false)
+                                goto end;
+                            Thread.Sleep(500);
+                            device.selectSlotChannel(slot, ch);
+                            SendTestEvent(TestEvent.CurrentTestSlotChannel_dd, slot,ch);
+                            Thread.Sleep(200);
+                            double source_pressure = device.getSourcePressure();
+                            double inner_pressure = device.getInnerPressure();
+                            double sensor_volt = device.getTestVoltage();
+                            SendTestEvent(TestEvent.HighPressureVal_ddfff, slot, ch, sensor_volt, source_pressure, inner_pressure);
+
+                            if (ch == 4)
+                                device.closeSlotChannel(slot, ch);  //最後一個通道是需要關閉的.
+                        }
+
+                    }
+                    
+                    device.disablePressure();
+                    SendTestEvent(TestEvent.CurrentTestState_s, "正在排气");
+                    Thread.Sleep(config.测试参数.排气静置时间 * 1000);
+                    for (int slot = 0; slot < 10 && runFlag; slot++)
+                    {
+                        for (int ch = 0; ch < 5; ch++)
+                        {
+                            if (channelsCrid[stateCol.Index, slot * 5 + ch].Value.ToString() == "空缺" ||
+                                (bool)(channelsCrid[enableCol.Index, slot * 5 + ch].Value) == false)
+                                continue;
+                            if (runFlag == false)
+                                goto end;
+                            Thread.Sleep(500);  //等待⽓气压稳定的时间约为500ms 
+                            device.selectSlotChannel(slot, ch);
+                            SendTestEvent(TestEvent.CurrentTestSlotChannel_dd, slot, ch);
+                            Thread.Sleep(200); //等待传感器器输出稳定的时间200ms
+                            double source_pressure = device.getSourcePressure();
+                            double inner_pressure = device.getInnerPressure();
+                            double sensor_volt = device.getTestVoltage();
+                            SendTestEvent(TestEvent.LowPressureVal_ddfff, slot, ch, sensor_volt, source_pressure, inner_pressure);
+                            SendTestEvent(TestEvent.EndChannelTest_dd, slot, ch);
+
+                            if (ch == 4)
+                                device.closeSlotChannel(slot, ch);  //最後一個通道是需要關閉的.
+                        }
+
+                    }
+
+                }
+            }
+            catch (Exception e)
+            {
+                runFlag = false;
+                device.Disconnect();
+                device = null;
+                SendTestEvent(TestEvent.ShowMessageBox_s, e.Message);
+                return;
+            }
+
+        end:
+            runFlag = false;
+            device.Disconnect();
+            device = null;
+            if (cycle_count >= config.测试参数.老化周期数)
+            {
+                SendTestEvent(TestEvent.TestEnd);
+                SendTestEvent(TestEvent.ShowMessageBox_s, String.Format("测试完成 共{0}个周期", config.测试参数.老化周期数));
+            }
+            else
+            {
+                SendTestEvent(TestEvent.TestAbort);
+                SendTestEvent(TestEvent.ShowMessageBox_s, 
+                String.Format("测试中断 共{0}个周期, 当前周期{1}", config.测试参数.老化周期数,cycle_count));
+            }
+            return;
+        }
+
+
+
+
+
         private void startBtn_Click(object sender, EventArgs e)
         {
+
+            startBtn.Enabled = false;
+            pauseBtn.Enabled = true;
+            stopBtn.Enabled = true;
+            configBtn.Enabled = false;
+            findBtn.Enabled = false;
+
             testThread = new Thread(new ThreadStart(testProc));
             testThread.Start();
         }
 
         private void pauseBtn_Click(object sender, EventArgs e)
         {
-
+            if (testThread.ThreadState != ThreadState.Suspended)
+            {
+                if(device!=null)
+                    device.pause();
+                testThread.Suspend();
+                stopBtn.Enabled = false;
+            }
+            else
+            {
+                stopBtn.Enabled = true;
+                testThread.Resume();
+                if (device != null)
+                    device.resume();
+            }
         }
 
         private void stopBtn_Click(object sender, EventArgs e)
         {
+            if (MessageBox.Show(this, "确认停止测试么,停止后将不能被恢复.", "提示",
+                MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                runFlag = false;
+            }
+        }
 
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (runFlag) {
+                MessageBox.Show(this, "正在测试中,请停止测试后关闭!");
+                e.Cancel = true;
+                return;
+            }
+            config.SaveIniFile();
+            config = null;
+        }
+
+        private void findBtn_Click(object sender, EventArgs e)
+        {
+            startBtn.Enabled = false;
+            configBtn.Enabled = false;
+            bool haveError = false;
+            device = new Device();
+            if (device.Connect())
+            {
+                for (int slot = 0; slot < 10; slot++)
+                {
+                    bool state = device.findSlot(slot);
+
+                    for (int ch = 0; ch < 5; ch++)
+                    {
+                        if (state == false && (bool)(channelsCrid[enableCol.Index, slot * 5 + ch].Value))
+                            haveError = true;
+                        channelsCrid[stateCol.Index, slot * 5 + ch].Value = state?"接入":"空缺";
+                        channelsCrid[stateCol.Index, slot * 5 + ch].Style.ForeColor = state ? Color.Black : Color.Red;
+                    }
+                }
+                if (haveError)
+                    MessageBox.Show(this, "注意:部分使能的端口没有找到.");
+                else
+                    MessageBox.Show(this, "所有使能的端口都已经接入.");
+            }
+            else
+            {
+                MessageBox.Show(this, "无法连接到设备");
+            }
+            startBtn.Enabled = true;
+            configBtn.Enabled = true;
+
+        }
+
+        private void 导出测试数据ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow i in sensorParamsGrid.Rows)
+            {
+                i.Selected = false;
+            }
         }
     }
 }

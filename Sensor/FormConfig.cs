@@ -87,6 +87,7 @@ namespace Sensor
                 }
                 channelsSlotCks[slot] = (CheckBox)obj;
                 channelsSlotCks[slot].MouseClick += new System.Windows.Forms.MouseEventHandler(this.channelSlotCheckBox_MouseClick);
+                channelsSlotCks[slot].Text = "";
                 //建立通道对应的复选框数组
                 for (int ch = 0; ch < 5; ch++)
                 {
@@ -106,6 +107,7 @@ namespace Sensor
                     }
                     channelsCks[slot, ch] = (CheckBox)obj;
                     channelsCks[slot, ch].MouseClick += new System.Windows.Forms.MouseEventHandler(this.channelCheckBox_MouseClick);
+                    channelsCks[slot, ch].Text = "";
 
                     channelsSlotCks[slot].Tag = slot; //插槽标记上序号用于操作一组通道
                     channelsCks[slot, ch].Tag = channelsSlotCks[slot]; //将对应的插槽复选框对象标记到通道上
@@ -283,6 +285,33 @@ namespace Sensor
             }
 
             this.Close();
+        }
+
+        private void sensorParamsGrid_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            string key = sensorParamsGrid[e.ColumnIndex - 1, e.RowIndex].Value.ToString();
+            string value = sensorParamsGrid[e.ColumnIndex, e.RowIndex].Value.ToString();
+            double val;
+            FormMain.ParamDesc paramDesc = sensorParamTable[key];
+            if (double.TryParse(value, out val) == false) {
+                MessageBox.Show(this, "输入值不合法");
+                sensorParamsGrid[e.ColumnIndex, e.RowIndex].Value = paramDesc.getValue();
+                return;
+            }
+
+            if (val < paramDesc.getMin() || val > paramDesc.getMax())
+            {
+                MessageBox.Show(this, String.Format("输入值超出范围 [{0},{1}]", paramDesc.getMin(), paramDesc.getMax()));
+                sensorParamsGrid[e.ColumnIndex, e.RowIndex].Value = paramDesc.getValue();
+                return;
+            }
+            
+
+        }
+
+        private void testParamsGrid_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

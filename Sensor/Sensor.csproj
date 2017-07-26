@@ -124,6 +124,7 @@
   <ItemGroup>
     <Content Include="hxSerialProtocol.dll" />
     <Content Include="Resources\config.png" />
+    <Content Include="Resources\find.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
