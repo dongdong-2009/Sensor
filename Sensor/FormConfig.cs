@@ -55,7 +55,8 @@ namespace Sensor
 
             FormMain.addParamsToGrid(sensorParamsGrid, sensorParamTable);
             FormMain.addParamsToGrid(testParamsGrid, testParamTable);
-
+            
+            
             //禁止选中
             foreach (DataGridViewRow i in sensorParamsGrid.Rows)
             {
@@ -312,6 +313,22 @@ namespace Sensor
         private void testParamsGrid_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
+        }
+
+        private void sensorParamsGrid_MouseUp(object sender, MouseEventArgs e)
+        {
+            //foreach (DataGridViewRow i in sensorParamsGrid.Rows)
+            //{
+            //    i.Selected = false;
+            //}
+        }
+
+        private void testParamsGrid_MouseUp(object sender, MouseEventArgs e)
+        {
+            //foreach (DataGridViewRow i in sensorParamsGrid.Rows)
+            //{
+            //    i.Selected = false;
+            //}
         }
     }
 }

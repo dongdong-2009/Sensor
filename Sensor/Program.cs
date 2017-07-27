@@ -18,4 +18,6 @@ namespace Sensor
             Application.Run(new FormMain());
         }
     }
+
 }
+

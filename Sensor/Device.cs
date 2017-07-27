@@ -1,6 +1,8 @@
 ﻿using hxTestTool;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -71,6 +73,32 @@ namespace Sensor
     {
         Mutex mut = new Mutex();
         ComPort ser = null;
+        FileStream logfs;
+        StreamWriter log;
+        public Device()
+        {
+            DateTime now = DateTime.Now;
+            string path = Environment.CurrentDirectory + "\\log_" + now.ToString("yyyyMMdd") + "\\";
+            Directory.CreateDirectory(path);
+            path += now.ToString("HHmmss") + ".txt";
+            logfs = File.Open(path, FileMode.OpenOrCreate);
+            StreamWriter sw = new StreamWriter(logfs);
+            log = sw;
+            log.AutoFlush = true;
+            
+        }
+        void write_log(string s)
+        {
+            log.WriteLine(DateTime.Now.ToString("[HH:mm:ss:fff]") + s);
+        }
+        ~Device()
+        {
+            if (ser != null)
+            {
+                ser.Close();
+                ser = null;
+            }
+        }
 
         public bool Connect()
         {
@@ -98,14 +126,7 @@ namespace Sensor
             }
             mut.ReleaseMutex();
         }
-        ~Device()
-        {
-            if (ser!=null)
-            {
-                ser.Close();
-                ser = null;
-            }
-        }
+        
 
         /// <summary>
         /// 与设备通讯
@@ -117,9 +138,7 @@ namespace Sensor
         /// <returns>返回接受到的结果</returns>
         public string command(DevAddress devAddr, DevFunction devFunc, DevChannel devCh, string data)
         {
-            {
-                return "1000";
-            }
+            write_log(new StackFrame(1).GetMethod().Name);
             if (ser == null)
             {
                 throw new Exception("内部错误,无效的串口对象");
@@ -138,8 +157,10 @@ namespace Sensor
             {
                 try
                 {
+                    write_log("send command: " + cmdstr);
                     ser.Send(cmdstr);
                     string resstr = ser.ReciveString(500);
+                    write_log("recv result: " + resstr);
                     int n = resstr.IndexOf("#");                        //检查开始字符
                     string slen = resstr.Substring(n + 1, 1);           //获取长度
                     int len = int.Parse(slen);

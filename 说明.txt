@@ -1,0 +1,12 @@
+.Net使用3.5版本
+输出目录: \Sensor\bin\x86\Debug 或 \Sensor\bin\x86\Release
+包含文件:
+Sensor.exe  执行文件
+xls.tmpl    EXCEL格式的模板文件
+default.cfg  当前的配置文件 
+Aspose.Cells.dll EXCEL库
+hxSerialProtocal.dll 串口库
+log_XXXXXXXX 目录为输出的日志,日志包含发送和接受串口的数据信息,用于调试
+rec_XXXXXXXX 测试记录数据,按启动测试的日期分文件
+
+

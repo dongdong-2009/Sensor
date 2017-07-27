@@ -28,16 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.sensorParamsGrid = new System.Windows.Forms.DataGridView();
-            this.sensorParam = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.sensorValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.sensorUnit = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.testParamsGrid = new System.Windows.Forms.DataGridView();
-            this.testParam = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.testValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.testUnit = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -139,6 +137,12 @@
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
+            this.sensorParam = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.sensorValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.sensorUnit = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.testParam = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.testValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.testUnit = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.sensorParamsGrid)).BeginInit();
             this.groupBox4.SuspendLayout();
@@ -182,25 +186,7 @@
             this.sensorParamsGrid.Size = new System.Drawing.Size(449, 197);
             this.sensorParamsGrid.TabIndex = 2;
             this.sensorParamsGrid.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.sensorParamsGrid_CellEndEdit);
-            // 
-            // sensorParam
-            // 
-            this.sensorParam.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.sensorParam.HeaderText = "参数";
-            this.sensorParam.Name = "sensorParam";
-            this.sensorParam.ReadOnly = true;
-            this.sensorParam.Width = 200;
-            // 
-            // sensorValue
-            // 
-            this.sensorValue.HeaderText = "值";
-            this.sensorValue.Name = "sensorValue";
-            // 
-            // sensorUnit
-            // 
-            this.sensorUnit.HeaderText = "单位";
-            this.sensorUnit.Name = "sensorUnit";
-            this.sensorUnit.ReadOnly = true;
+            this.sensorParamsGrid.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sensorParamsGrid_MouseUp);
             // 
             // groupBox4
             // 
@@ -231,25 +217,7 @@
             this.testParamsGrid.Size = new System.Drawing.Size(449, 230);
             this.testParamsGrid.TabIndex = 2;
             this.testParamsGrid.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.testParamsGrid_CellContentClick);
-            // 
-            // testParam
-            // 
-            this.testParam.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.testParam.HeaderText = "参数";
-            this.testParam.Name = "testParam";
-            this.testParam.ReadOnly = true;
-            this.testParam.Width = 200;
-            // 
-            // testValue
-            // 
-            this.testValue.HeaderText = "值";
-            this.testValue.Name = "testValue";
-            // 
-            // testUnit
-            // 
-            this.testUnit.HeaderText = "单位";
-            this.testUnit.Name = "testUnit";
-            this.testUnit.ReadOnly = true;
+            this.testParamsGrid.MouseUp += new System.Windows.Forms.MouseEventHandler(this.testParamsGrid_MouseUp);
             // 
             // button1
             // 
@@ -1357,6 +1325,58 @@
             this.groupBox8.Size = new System.Drawing.Size(847, 10);
             this.groupBox8.TabIndex = 8;
             this.groupBox8.TabStop = false;
+            // 
+            // sensorParam
+            // 
+            this.sensorParam.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.sensorParam.DefaultCellStyle = dataGridViewCellStyle1;
+            this.sensorParam.HeaderText = "参数";
+            this.sensorParam.Name = "sensorParam";
+            this.sensorParam.ReadOnly = true;
+            this.sensorParam.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.sensorParam.Width = 200;
+            // 
+            // sensorValue
+            // 
+            this.sensorValue.HeaderText = "值";
+            this.sensorValue.Name = "sensorValue";
+            this.sensorValue.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // sensorUnit
+            // 
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.sensorUnit.DefaultCellStyle = dataGridViewCellStyle2;
+            this.sensorUnit.HeaderText = "单位";
+            this.sensorUnit.Name = "sensorUnit";
+            this.sensorUnit.ReadOnly = true;
+            this.sensorUnit.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // testParam
+            // 
+            this.testParam.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.testParam.DefaultCellStyle = dataGridViewCellStyle3;
+            this.testParam.HeaderText = "参数";
+            this.testParam.Name = "testParam";
+            this.testParam.ReadOnly = true;
+            this.testParam.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.testParam.Width = 200;
+            // 
+            // testValue
+            // 
+            this.testValue.HeaderText = "值";
+            this.testValue.Name = "testValue";
+            this.testValue.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // testUnit
+            // 
+            dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.testUnit.DefaultCellStyle = dataGridViewCellStyle4;
+            this.testUnit.HeaderText = "单位";
+            this.testUnit.Name = "testUnit";
+            this.testUnit.ReadOnly = true;
+            this.testUnit.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // FormConfig
             // 

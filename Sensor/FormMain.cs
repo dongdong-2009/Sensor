@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Aspose.Cells;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -84,6 +85,7 @@ namespace Sensor
         public bool[,] channelEnableTable = new bool[10, 5];        //通道使能表
         string[] channelNumbers = new string[50];                   //传感器编号
         Config config;              //配置文件
+        Database db ;               //数据存储
         public FormMain()
         {
             InitializeComponent();
@@ -91,7 +93,6 @@ namespace Sensor
 
         private void FormMain_Load(object sender, EventArgs e)
         {
-  
             //主表创建
             channelsCrid.Rows.Clear();
             channelsCrid.Rows.Add(50);
@@ -350,8 +351,8 @@ namespace Sensor
             CurrentTestSlotChannel_dd,   //当前测试通道
             TestTotleTime,              //总时间
             TestCurrentTime,            //当前周期历时
-            LowPressureVal_ddfff,          //传感器低压信息,参数:插槽,通道,传感器输出电压值,气源压力值,工装内压力值
-            HighPressureVal_ddfff,          //传感器高压信息,同上
+            LowPressureVal_dddfff,          //传感器低压信息,参数:插槽,通道,传感器输出电压值,气源压力值,工装内压力值
+            HighPressureVal_dddfff,          //传感器高压信息,同上
             EndChannelTest_dd,                 //完成一个通道的高低压测试.
         }
         volatile bool runFlag = false;
@@ -401,6 +402,9 @@ namespace Sensor
                         stopBtn.Enabled = true;
                         configBtn.Enabled = false;
                         findBtn.Enabled = false;
+                        导入配置文件ToolStripMenuItem.Enabled = false;
+                        导出测试数据ToolStripMenuItem.Enabled = false;
+                        导出配置文件ToolStripMenuItem.Enabled = false;
                         for (int i = 0; i < 50; i++)
                         {
                             channelsCrid[highValueCol.Index, i].Value = "";
@@ -415,9 +419,15 @@ namespace Sensor
                         stopBtn.Enabled = false;
                         configBtn.Enabled = true;
                         findBtn.Enabled = true;
+                        导入配置文件ToolStripMenuItem.Enabled = true;
+                        导出测试数据ToolStripMenuItem.Enabled = true;
+                        导出配置文件ToolStripMenuItem.Enabled = true;
 
                         timeBegainTest = 0;
                         timeBegainCycle = 0;
+
+                        db.close();
+                        db = null;
                         break;
                     case TestEvent.TestAbort:
                         startBtn.Enabled = true;
@@ -425,9 +435,15 @@ namespace Sensor
                         stopBtn.Enabled = false;
                         configBtn.Enabled = true;
                         findBtn.Enabled = true;
+                        导入配置文件ToolStripMenuItem.Enabled = true;
+                        导出测试数据ToolStripMenuItem.Enabled = true;
+                        导出配置文件ToolStripMenuItem.Enabled = true;
 
                         timeBegainTest = 0;
                         timeBegainCycle = 0;
+
+                        db.close();
+                        db = null;
                         break;
                     case TestEvent.CycleBegain:
                         for (int i = 0; i < 50; i++)
@@ -462,13 +478,14 @@ namespace Sensor
                             }
                             break;
                         }
-                    case TestEvent.HighPressureVal_ddfff:
+                    case TestEvent.HighPressureVal_dddfff:
                         {
-                            int slot = (int)p[0];
-                            int ch = (int)p[1];
-                            double sensor_volt = (double)p[2];
-                            double source_pressure = (double)p[3];
-                            double inner_pressure = (double)p[4];
+                            int cycle = (int)p[0];
+                            int slot = (int)p[1];
+                            int ch = (int)p[2];
+                            double sensor_volt = (double)p[3];
+                            double source_pressure = (double)p[4];
+                            double inner_pressure = (double)p[5];
                             double sensor_pressure = calc_sensor_pres(sensor_volt);
 
                             labelSourcePressure.Text = "气源压力: " +
@@ -506,16 +523,19 @@ namespace Sensor
                                     i.Selected = false;
                                 }
                             }
+                            string sensor_nm = channelsCrid[sensorNameCol.Index, slot * 5 + ch].Value.ToString();
+                            db.insertHightTestVal(cycle, slot, ch, sensor_nm, highval, hpass);
 
                             break;
                         }
-                    case TestEvent.LowPressureVal_ddfff:
+                    case TestEvent.LowPressureVal_dddfff:
                         {
-                            int slot = (int)p[0];
-                            int ch = (int)p[1];
-                            double sensor_volt = (double)p[2];
-                            double source_pressure = (double)p[3];
-                            double inner_pressure = (double)p[4];
+                            int cycle = (int)p[0];
+                            int slot = (int)p[1];
+                            int ch = (int)p[2];
+                            double sensor_volt = (double)p[3];
+                            double source_pressure = (double)p[4];
+                            double inner_pressure = (double)p[5];
                             double sensor_pressure = calc_sensor_pres(sensor_volt);
 
                             labelSourcePressure.Text = "气源压力: " + 
@@ -555,11 +575,14 @@ namespace Sensor
                                 runFlag = false;
 
                             }
-                            
+                            string sensor_nm = channelsCrid[sensorNameCol.Index, slot * 5 + ch].Value.ToString();
+                            db.insertLowTestVal(cycle,slot, ch, sensor_nm, lowval,lpass);
                             break;
                         }
                     case TestEvent.EndChannelTest_dd:
-                        {/* //如果测完一轮充放气才报结果就这样
+                        {
+
+                            /* //如果测完一轮充放气才报结果就这样
                             int slot = (int)p[0];
                             int ch = (int)p[1];
                             double lowval = 0.0,highval=0.0;
@@ -657,7 +680,7 @@ namespace Sensor
                             double source_pressure = device.getSourcePressure();
                             double inner_pressure = device.getInnerPressure();
                             double sensor_volt = device.getTestVoltage();
-                            SendTestEvent(TestEvent.HighPressureVal_ddfff, slot, ch, sensor_volt, source_pressure, inner_pressure);
+                            SendTestEvent(TestEvent.HighPressureVal_dddfff, cycle_count, slot, ch, sensor_volt, source_pressure, inner_pressure);
 
                             if (ch == 4)
                                 device.closeSlotChannel(slot, ch);  //最後一個通道是需要關閉的.
@@ -684,7 +707,7 @@ namespace Sensor
                             double source_pressure = device.getSourcePressure();
                             double inner_pressure = device.getInnerPressure();
                             double sensor_volt = device.getTestVoltage();
-                            SendTestEvent(TestEvent.LowPressureVal_ddfff, slot, ch, sensor_volt, source_pressure, inner_pressure);
+                            SendTestEvent(TestEvent.LowPressureVal_dddfff, cycle_count, slot, ch, sensor_volt, source_pressure, inner_pressure);
                             SendTestEvent(TestEvent.EndChannelTest_dd, slot, ch);
 
                             if (ch == 4)
@@ -700,7 +723,8 @@ namespace Sensor
                 runFlag = false;
                 device.Disconnect();
                 device = null;
-                SendTestEvent(TestEvent.ShowMessageBox_s, e.Message);
+                SendTestEvent(TestEvent.TestEnd);
+                SendTestEvent(TestEvent.ShowMessageBox_s,"测试异常中断: "+ e.Message);
                 return;
             }
 
@@ -728,12 +752,17 @@ namespace Sensor
 
         private void startBtn_Click(object sender, EventArgs e)
         {
-
+            db = new Database();
+            db.create();
             startBtn.Enabled = false;
             pauseBtn.Enabled = true;
             stopBtn.Enabled = true;
             configBtn.Enabled = false;
             findBtn.Enabled = false;
+
+            导入配置文件ToolStripMenuItem.Enabled = false;
+            导出测试数据ToolStripMenuItem.Enabled = false;
+            导出配置文件ToolStripMenuItem.Enabled = false;
 
             testThread = new Thread(new ThreadStart(testProc));
             testThread.Start();
@@ -810,12 +839,132 @@ namespace Sensor
             configBtn.Enabled = true;
 
         }
-
+        
         private void 导出测试数据ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            foreach (DataGridViewRow i in sensorParamsGrid.Rows)
+            if (device != null)
             {
-                i.Selected = false;
+                device.Disconnect();
+                device = null;
+            }
+            string s = Database.lastRecordPath;
+            string sname = Database.lastRecordDateTime;
+            if (s == null || s == "") {
+                MessageBox.Show(this, "还没有测试数据.");
+                return;
+            }
+            try
+            {
+                SaveFileDialog d = new SaveFileDialog();
+                d.Filter = "xls文件(*.xls)|*.xls";
+                if (d.ShowDialog(this) != DialogResult.OK)
+                    return;
+                string path = d.FileName;
+                try
+                {
+
+                    Workbook book=null;
+                    try
+                    {
+                        book = new Workbook(Environment.CurrentDirectory + "\\xls.tmpl");
+                    }
+                    catch { }
+                    if (book == null)
+                        book = new Workbook();  //没有模板也得用啊
+                    book.Worksheets.Add(SheetType.Worksheet);
+                    book.Worksheets.Add(SheetType.Worksheet);
+                    Worksheet sheetHigh = book.Worksheets[0];
+                    Worksheet sheetLow = book.Worksheets[1];
+                    sheetHigh.Name = "高压测试数据_" + sname;
+                    sheetLow.Name = "低压测试数据_" + sname;
+
+                    sheetHigh.Cells[0, 0].Value = "测试周期";
+                    sheetHigh.Cells[0, 1].Value = "插槽号";
+                    sheetHigh.Cells[0, 2].Value = "通道号";
+                    sheetHigh.Cells[0, 3].Value = "传感器编号";
+                    sheetHigh.Cells[0, 4].Value = "高压值";
+                    sheetHigh.Cells[0, 5].Value = "测试结果";
+
+                    sheetLow.Cells[0, 0].Value = "测试周期";
+                    sheetLow.Cells[0, 1].Value = "插槽号";
+                    sheetLow.Cells[0, 2].Value = "通道号";
+                    sheetLow.Cells[0, 3].Value = "传感器编号";
+                    sheetLow.Cells[0, 4].Value = "低压值";
+                    sheetLow.Cells[0, 5].Value = "测试结果";
+
+                    /*
+                     * 周期 slot ch
+                     * 0    0    0
+                     * 0    0    1
+                     * 
+                     */
+                    FileStream fs = File.Open(s, FileMode.OpenOrCreate);
+                    StreamReader sr = new StreamReader(fs);
+                    string l = sr.ReadLine();
+                    if (l == null || l == "")
+                    {
+                        MessageBox.Show("没有数据需要导出.");
+                        sr.Close();
+                        fs.Close();
+                        return;
+                    }
+                    int rowcountLow = 1;
+                    int rowcountHight = 1;
+                    do
+                    {
+                        string[] ss = l.Split(' ');
+                        string flag = ss[0];
+                        int cycle = int.Parse(ss[1]);
+                        int slot = int.Parse(ss[2]);
+                        int ch = int.Parse(ss[3]);
+                        double val = double.Parse(ss[4]);
+                        bool pass = bool.Parse(ss[5]);
+                        string sensor_nm = ss[6];
+
+                        if (flag == "H")
+                        {
+                            sheetHigh.Cells[rowcountHight, 0].Value = cycle;
+                            sheetHigh.Cells[rowcountHight, 1].Value = slot;
+                            sheetHigh.Cells[rowcountHight, 2].Value = ch;
+                            sheetHigh.Cells[rowcountHight, 3].Value = sensor_nm;
+                            sheetHigh.Cells[rowcountHight, 4].Value = val;
+                            sheetHigh.Cells[rowcountHight, 5].Value = pass? "PASS" : "FAIL";
+                        }
+                        else if (flag == "L")
+                        {
+                            sheetLow.Cells[rowcountLow, 0].Value = cycle;
+                            sheetLow.Cells[rowcountLow, 1].Value = slot;
+                            sheetLow.Cells[rowcountLow, 2].Value = ch;
+                            sheetLow.Cells[rowcountLow, 3].Value = sensor_nm;
+                            sheetLow.Cells[rowcountLow, 4].Value = val;
+                            sheetLow.Cells[rowcountLow, 5].Value = pass ? "PASS" : "FAIL";
+                        }
+                        else
+                        {
+
+                        }
+                        rowcountHight++;
+                        rowcountLow++;
+                        l = sr.ReadLine();
+                    } while (l != null && l != "");
+
+                    book.Save(path);
+
+                    sr.Close();
+                    fs.Close();
+                }
+                catch (Exception ee)
+                {
+                    MessageBox.Show("导出失败." + ee.Message);
+                    return;
+                }
+                MessageBox.Show("导出完成.");
+            
+            }
+            catch(Exception ee)
+            {
+                MessageBox.Show(this, "读取记录错误." + ee.Message);
+
             }
         }
     }

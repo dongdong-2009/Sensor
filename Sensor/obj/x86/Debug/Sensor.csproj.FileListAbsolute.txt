@@ -8,3 +8,5 @@ C:\work\Sensor\Sensor\Sensor\obj\x86\Debug\Sensor.csproj.GenerateResource.Cache
 C:\work\Sensor\Sensor\Sensor\obj\x86\Debug\Sensor.exe
 C:\work\Sensor\Sensor\Sensor\obj\x86\Debug\Sensor.pdb
 C:\work\Sensor\Sensor\Sensor\obj\x86\Debug\Sensor.csprojResolveAssemblyReference.cache
+C:\work\Sensor\Sensor\Sensor\bin\x86\Debug\Aspose.Cells.dll
+C:\work\Sensor\Sensor\Sensor\bin\x86\Debug\Aspose.Cells.xml
