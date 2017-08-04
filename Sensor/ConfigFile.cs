@@ -18,7 +18,7 @@ public class Config : INIConfig
         public double 传感器输出电压最小值 = 0.01;
         public double 传感器输出电压最大值 = 12.00;
         public double 传感器精度 = 0.01;
-        public double 传感器供电电压 = 12.00;
+        public double 传感器供电电压 = 24.00;
 
     }
 
@@ -34,6 +34,11 @@ public class Config : INIConfig
         public double 充气高压压力 = 1000.000;
         public int 充气高压时间 = 1;
         public int 排气静置时间 = 1;
+        /// <summary>
+        /// 0:都不测试  1:每次都测试  2:间隔一次测试
+        /// 算法是 当值为0都不测试, 当值>=1,用当前的周期%他,如果为0就进行测量.不为0则不测量.
+        /// </summary>
+        public int 测量周期步进 = 1;  //HXD 20170804 
 
     }
 

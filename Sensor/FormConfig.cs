@@ -330,5 +330,10 @@ namespace Sensor
             //    i.Selected = false;
             //}
         }
+
+        private void sensorParamsGrid_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
     }
 }

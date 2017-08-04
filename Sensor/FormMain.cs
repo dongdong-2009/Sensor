@@ -138,16 +138,17 @@ namespace Sensor
             //传感器参数
             sensorParamTable.Add("传感器量程最小值", new ParamDesc(config.传感器参数.传感器量程最小值, "0.000", "Mpa", -1000.000f, 1000.000f, 0.001));
             sensorParamTable.Add("传感器量程最大值", new ParamDesc(config.传感器参数.传感器量程最大值, "0.000", "Mpa", -1000.000f, 1000.000f, 0.001));
-            sensorParamTable.Add("传感器输出电压最小值", new ParamDesc(config.传感器参数.传感器输出电压最小值, "0.00", "V", 0.01, 12.00, 0.01));
+            sensorParamTable.Add("传感器输出电压最小值", new ParamDesc(config.传感器参数.传感器输出电压最小值, "0.00", "V", 0.00, 12.00, 0.01));
             sensorParamTable.Add("传感器输出电压最大值", new ParamDesc(config.传感器参数.传感器输出电压最大值, "0.00", "V", 0.01, 12.00, 0.01));
             sensorParamTable.Add("传感器精度", new ParamDesc(config.传感器参数.传感器精度, "0.00", "%", 0.001, 10.000, 0.001));
-            sensorParamTable.Add("传感器供电电压", new ParamDesc(config.传感器参数.传感器供电电压, "0.00", "V", 0.01, 12.00, 0.01));
+            sensorParamTable.Add("传感器供电电压", new ParamDesc(config.传感器参数.传感器供电电压, "0.00", "V", 0.01, 24.00, 0.01));
 
             //测试参数
             testParamTable.Add("老化周期数", new ParamDesc(config.测试参数.老化周期数, "", "次", 1, 10000, 1));
             testParamTable.Add("充气(高压)压力", new ParamDesc(config.测试参数.充气高压压力, "0.000", "Mpa", -1000.000f, 1000.000f, 0.001));
             testParamTable.Add("充气(高压)时间", new ParamDesc(config.测试参数.充气高压时间, "", "秒", 1, 200, 1));
             testParamTable.Add("排气(静置)时间", new ParamDesc(config.测试参数.排气静置时间, "", "秒", 1, 200, 1));
+            testParamTable.Add("测量周期步进", new ParamDesc(config.测试参数.测量周期步进, "", "周期", 0, 10000, 1));
 
             pressureParamDesc = testParamTable["充气(高压)压力"];
             if (pressureParamDesc == null)
@@ -351,9 +352,13 @@ namespace Sensor
             CurrentTestSlotChannel_dd,   //当前测试通道
             TestTotleTime,              //总时间
             TestCurrentTime,            //当前周期历时
-            LowPressureVal_dddfff,          //传感器低压信息,参数:插槽,通道,传感器输出电压值,气源压力值,工装内压力值
-            HighPressureVal_dddfff,          //传感器高压信息,同上
+            LowPressureVal_dddf,          //传感器低压信息,参数:插槽,通道,传感器输出电压值,气源压力值,工装内压力值
+            HighPressureVal_dddf,          //传感器高压信息,同上
             EndChannelTest_dd,                 //完成一个通道的高低压测试.
+
+            //HXD 20170804
+            EndChargePresure_ff,           //充气完成
+            EndReleasePresure_ff,          //放气完成
         }
         volatile bool runFlag = false;
         Thread testThread = null;
@@ -478,20 +483,14 @@ namespace Sensor
                             }
                             break;
                         }
-                    case TestEvent.HighPressureVal_dddfff:
+                    case TestEvent.HighPressureVal_dddf:
                         {
                             int cycle = (int)p[0];
                             int slot = (int)p[1];
                             int ch = (int)p[2];
                             double sensor_volt = (double)p[3];
-                            double source_pressure = (double)p[4];
-                            double inner_pressure = (double)p[5];
                             double sensor_pressure = calc_sensor_pres(sensor_volt);
 
-                            labelSourcePressure.Text = "气源压力: " +
-                                source_pressure.ToString(pressureParamDesc.getFormat()) + " " + pressureParamDesc.getUnit();
-                            labelInnerPressure.Text = "传感器工装内压力: " +
-                                inner_pressure.ToString(pressureParamDesc.getFormat()) + " " + pressureParamDesc.getUnit();
                             string s = sensor_pressure.ToString(pressureParamDesc.getFormat());
                             channelsCrid[highValueCol.Index, slot * 5 + ch].Value = s;
                             channelsCrid[lowValueCol.Index, slot * 5 + ch].Selected = true;
@@ -517,7 +516,9 @@ namespace Sensor
                             {
                                 channelsCrid[resultCol.Index, slot * 5 + ch].Value = "FALSE";
                                 channelsCrid[resultCol.Index, slot * 5 + ch].Style.BackColor = Color.Red;
-                                runFlag = false;
+                                //HXD 20170804
+                                //一项测试失败不停止继续
+                                //runFlag = false;
                                 foreach (DataGridViewRow i in channelsCrid.Rows)
                                 {
                                     i.Selected = false;
@@ -528,20 +529,15 @@ namespace Sensor
 
                             break;
                         }
-                    case TestEvent.LowPressureVal_dddfff:
+                    case TestEvent.LowPressureVal_dddf:
                         {
                             int cycle = (int)p[0];
                             int slot = (int)p[1];
                             int ch = (int)p[2];
                             double sensor_volt = (double)p[3];
-                            double source_pressure = (double)p[4];
-                            double inner_pressure = (double)p[5];
                             double sensor_pressure = calc_sensor_pres(sensor_volt);
 
-                            labelSourcePressure.Text = "气源压力: " + 
-                                source_pressure.ToString(pressureParamDesc.getFormat()) + " " + pressureParamDesc.getUnit();
-                            labelInnerPressure.Text = "传感器工装内压力: " +
-                                inner_pressure.ToString(pressureParamDesc.getFormat()) + " " + pressureParamDesc.getUnit();
+                            
                             string s = sensor_pressure.ToString(pressureParamDesc.getFormat());
                             channelsCrid[lowValueCol.Index, slot * 5 + ch].Value = s;
                             channelsCrid[lowValueCol.Index, slot * 5 + ch].Selected = true;
@@ -572,11 +568,26 @@ namespace Sensor
                                 {
                                     i.Selected = false;
                                 }
-                                runFlag = false;
+                                //HXD 20170804
+                                //一项测试失败不停止继续
+                                //runFlag = false;
 
                             }
                             string sensor_nm = channelsCrid[sensorNameCol.Index, slot * 5 + ch].Value.ToString();
                             db.insertLowTestVal(cycle,slot, ch, sensor_nm, lowval,lpass);
+                            break;
+                        }
+                        //HXD 20170804
+                        //充放气稳定后发送一次结果供显示
+                    case TestEvent.EndChargePresure_ff: 
+                    case TestEvent.EndReleasePresure_ff:
+                        {
+                            double source_pressure = (double)p[4];
+                            double inner_pressure = (double)p[5];
+                            labelSourcePressure.Text = "气源压力: " +
+                                source_pressure.ToString(pressureParamDesc.getFormat()) + " " + pressureParamDesc.getUnit();
+                            labelInnerPressure.Text = "传感器工装内压力: " +
+                                inner_pressure.ToString(pressureParamDesc.getFormat()) + " " + pressureParamDesc.getUnit();
                             break;
                         }
                     case TestEvent.EndChannelTest_dd:
@@ -632,13 +643,14 @@ namespace Sensor
 
         private double calc_sensor_pres(double sensor_volt)
         {
+            //WT 20170730
+            //修改传感器压力计算方法
+            sensor_volt = sensor_volt / 1000.0;
             double pleft = config.传感器参数.传感器量程最小值;
-            double pright = config.传感器参数.传感器输出电压最大值;
-            double pstep = (pright - pleft) * config.传感器参数.传感器精度 / 100.0;       //压力最小量
-            double vleft = config.传感器参数.传感器量程最小值;
-            double vright = config.传感器参数.传感器量程最大值;
-            double vstep = (vright - vleft) * config.传感器参数.传感器精度 / 100.0;       //电压最小量
-            double pres = ((sensor_volt - vleft) / vstep) * pstep + pleft;                //计算输出的压力值
+            double pright = config.传感器参数.传感器量程最大值;
+            double vleft = config.传感器参数.传感器输出电压最小值;
+            double vright = config.传感器参数.传感器输出电压最大值;
+            double pres = ((sensor_volt - vleft) /(vright- vleft)) * (pright- pleft) + pleft;                //计算输出的压力值
             return pres;
         }
 
@@ -647,6 +659,9 @@ namespace Sensor
             runFlag = true;
             device = new Device();
             int cycle_count=0;
+            int period_start_time;
+
+
             try
             {
                 if( device.Connect() == false)
@@ -662,60 +677,103 @@ namespace Sensor
                     device.closeAllChannel();
                     device.setPowerVoltage(config.传感器参数.传感器供电电压);
                     device.enablePressure();
+                    //记录此时时刻
+                    period_start_time = System.Environment.TickCount/ 1000;
                     SendTestEvent(TestEvent.CurrentTestState_s, "正在充气");
-                    Thread.Sleep(config.测试参数.排气静置时间 * 1000);
-                    for (int slot = 0; slot < 10 && runFlag; slot++)
+                    //WT 20170730 
+                    //注释掉进气等待时间
+                    //进气后约500ms气压就会稳定可以切换通道开始测量
+                    //测量过程中花费的时间是算在进气时间内的
+                    //如果测量时间超过近期时间，测量完毕后切换状态，否则继续等待直到超时
+                    //Thread.Sleep(config.测试参数.排气静置时间 * 1000);
+                    //添加进气稳定延时
+                    Thread.Sleep(500);
+
+                    //HXD 20170804
+                    //充气完了发送一个事件
+                    double source_pressure = device.getSourcePressure();
+                    double inner_pressure = device.getInnerPressure();
+                    SendTestEvent(TestEvent.EndChargePresure_ff, source_pressure, inner_pressure);
+
+                    if (config.测试参数.测量周期步进!=0 && (cycle_count % config.测试参数.测量周期步进) == 0)
                     {
-                        for (int ch = 0; ch < 5; ch++)
+                        for (int slot = 0; slot < 10 && runFlag; slot++)
                         {
-                            if (channelsCrid[stateCol.Index, slot * 5 + ch].Value.ToString() == "空缺" ||
-                                (bool)(channelsCrid[enableCol.Index, slot * 5 + ch].Value) == false)
-                                continue;
-                            if (runFlag == false)
-                                goto end;
-                            Thread.Sleep(500);
-                            device.selectSlotChannel(slot, ch);
-                            SendTestEvent(TestEvent.CurrentTestSlotChannel_dd, slot,ch);
-                            Thread.Sleep(200);
-                            double source_pressure = device.getSourcePressure();
-                            double inner_pressure = device.getInnerPressure();
-                            double sensor_volt = device.getTestVoltage();
-                            SendTestEvent(TestEvent.HighPressureVal_dddfff, cycle_count, slot, ch, sensor_volt, source_pressure, inner_pressure);
+                            for (int ch = 0; ch < 5; ch++)
+                            {
+                                if (channelsCrid[stateCol.Index, slot * 5 + ch].Value.ToString() == "空缺" ||
+                                    (bool)(channelsCrid[enableCol.Index, slot * 5 + ch].Value) == false)
+                                    continue;
+                                if (runFlag == false)
+                                    goto end;
 
-                            if (ch == 4)
-                                device.closeSlotChannel(slot, ch);  //最後一個通道是需要關閉的.
+                                device.selectSlotChannel(slot, ch);
+                                //WT 20170730
+                                //取消此时的延时
+                                // Thread.Sleep(500);
+                                SendTestEvent(TestEvent.CurrentTestSlotChannel_dd, slot, ch);
+                                Thread.Sleep(200);
+                                //不必每次都测量压力
+                                //double source_pressure = device.getSourcePressure();
+                                //double inner_pressure = device.getInnerPressure();
+                                double sensor_volt = device.getTestVoltage();
+
+                                SendTestEvent(TestEvent.HighPressureVal_dddf, cycle_count, slot, ch, sensor_volt);
+
+                                if (ch == 4)
+                                    device.closeSlotChannel(slot, ch);  //最後一個通道是需要關閉的.
+                            }
+
                         }
-
                     }
-                    
+                    //等待该流程结束
+                    while (System.Environment.TickCount / 1000 - period_start_time <= config.测试参数.充气高压时间)
+                    {
+                    }
                     device.disablePressure();
+                    //记录此刻时间
+                    period_start_time = System.Environment.TickCount / 1000;
                     SendTestEvent(TestEvent.CurrentTestState_s, "正在排气");
-                    Thread.Sleep(config.测试参数.排气静置时间 * 1000);
-                    for (int slot = 0; slot < 10 && runFlag; slot++)
+                    //Thread.Sleep(config.测试参数.排气静置时间 * 1000);
+                    Thread.Sleep(500);  //等待⽓气压稳定的时间约为500ms 
+
+                    //HXD 20170804
+                    //放气完了发送一个事件
+                    source_pressure = device.getSourcePressure();
+                    inner_pressure = device.getInnerPressure();
+                    SendTestEvent(TestEvent.EndChargePresure_ff, source_pressure, inner_pressure);
+                    if (config.测试参数.测量周期步进 != 0 && (cycle_count % config.测试参数.测量周期步进) == 0)
                     {
-                        for (int ch = 0; ch < 5; ch++)
+                        for (int slot = 0; slot < 10 && runFlag; slot++)
                         {
-                            if (channelsCrid[stateCol.Index, slot * 5 + ch].Value.ToString() == "空缺" ||
-                                (bool)(channelsCrid[enableCol.Index, slot * 5 + ch].Value) == false)
-                                continue;
-                            if (runFlag == false)
-                                goto end;
-                            Thread.Sleep(500);  //等待⽓气压稳定的时间约为500ms 
-                            device.selectSlotChannel(slot, ch);
-                            SendTestEvent(TestEvent.CurrentTestSlotChannel_dd, slot, ch);
-                            Thread.Sleep(200); //等待传感器器输出稳定的时间200ms
-                            double source_pressure = device.getSourcePressure();
-                            double inner_pressure = device.getInnerPressure();
-                            double sensor_volt = device.getTestVoltage();
-                            SendTestEvent(TestEvent.LowPressureVal_dddfff, cycle_count, slot, ch, sensor_volt, source_pressure, inner_pressure);
-                            SendTestEvent(TestEvent.EndChannelTest_dd, slot, ch);
+                            for (int ch = 0; ch < 5; ch++)
+                            {
+                                if (channelsCrid[stateCol.Index, slot * 5 + ch].Value.ToString() == "空缺" ||
+                                    (bool)(channelsCrid[enableCol.Index, slot * 5 + ch].Value) == false)
+                                    continue;
+                                if (runFlag == false)
+                                    goto end;
 
-                            if (ch == 4)
-                                device.closeSlotChannel(slot, ch);  //最後一個通道是需要關閉的.
+                                device.selectSlotChannel(slot, ch);
+                                SendTestEvent(TestEvent.CurrentTestSlotChannel_dd, slot, ch);
+                                Thread.Sleep(200); //等待传感器器输出稳定的时间200ms
+                                                   //double source_pressure = device.getSourcePressure();
+                                                   //double inner_pressure = device.getInnerPressure();
+                                double sensor_volt = device.getTestVoltage();
+                                SendTestEvent(TestEvent.LowPressureVal_dddf, cycle_count, slot, ch, sensor_volt);
+
+                                SendTestEvent(TestEvent.EndChannelTest_dd, slot, ch);
+
+                                if (ch == 4)
+                                    device.closeSlotChannel(slot, ch);  //最後一個通道是需要關閉的.
+                            }
+
                         }
-
                     }
-
+                    //等待该流程结束
+                    while (System.Environment.TickCount / 1000 - period_start_time <= config.测试参数.排气静置时间)
+                    {
+                    }
                 }
             }
             catch (Exception e)
@@ -724,7 +782,7 @@ namespace Sensor
                 device.Disconnect();
                 device = null;
                 SendTestEvent(TestEvent.TestEnd);
-                SendTestEvent(TestEvent.ShowMessageBox_s,"测试异常中断: "+ e.Message);
+                SendTestEvent(TestEvent.ShowMessageBox_s, "测试异常中断: " + e.Message);
                 return;
             }
 
@@ -740,8 +798,8 @@ namespace Sensor
             else
             {
                 SendTestEvent(TestEvent.TestAbort);
-                SendTestEvent(TestEvent.ShowMessageBox_s, 
-                String.Format("测试中断 共{0}个周期, 当前周期{1}", config.测试参数.老化周期数,cycle_count));
+                SendTestEvent(TestEvent.ShowMessageBox_s,
+                String.Format("测试中断 共{0}个周期, 当前周期{1}", config.测试参数.老化周期数, cycle_count));
             }
             return;
         }
@@ -966,6 +1024,11 @@ namespace Sensor
                 MessageBox.Show(this, "读取记录错误." + ee.Message);
 
             }
+        }
+
+        private void labelCurrentTime_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

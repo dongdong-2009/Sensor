@@ -65,7 +65,9 @@ namespace Sensor
         CH5 = '5',
         CH6 = '6',
         CH7 = '7',
-        CH_ALL = 'a',
+        //WT 20170730
+        //修改全部通道地址
+        CH_ALL = '8',
         CH_NONE = 'n',
     };
    
@@ -106,7 +108,9 @@ namespace Sensor
             ser = new ComPort();
             ser.Baudrate = 115200;
             ser.Close();
-            if (ser.Open(1) == false)
+            //WT 20170730 
+            //暂时修改COM口
+            if (ser.Open(2) == false)
             {
                 ser.Close();
                 ser = null;
@@ -145,7 +149,9 @@ namespace Sensor
             }
             mut.WaitOne();
             ser.Recive(1024, 1);    //clear rbuffer
-            string cmdstr = String.Format("+{0}{1}{2}{3}{4}-", 
+            //WT 20170730
+            //修改包头和包尾
+            string cmdstr = String.Format(":{0}{1}{2}{3}{4}=", 
                 data.Length, 
                 ((char)devAddr).ToString(), 
                 ((char)devFunc).ToString(),
@@ -159,7 +165,13 @@ namespace Sensor
                 {
                     write_log("send command: " + cmdstr);
                     ser.Send(cmdstr);
-                    string resstr = ser.ReciveString(500);
+                    //WT 20170730
+                    //添加80m延时
+                    //对于获取测量结果的命令，发送数据是异步的。
+                    //接收到命令后后会在约100 -200ms后完成采样和转换并回复结果.
+                    //增大串口接收的字节数保证数据每次能被接收到（115200bps接收1000字节约需90ms）
+                    Thread.Sleep(80);
+                    string resstr = ser.ReciveString(1000);
                     write_log("recv result: " + resstr);
                     int n = resstr.IndexOf("#");                        //检查开始字符
                     string slen = resstr.Substring(n + 1, 1);           //获取长度
@@ -167,7 +179,10 @@ namespace Sensor
                     DevAddress addr = (DevAddress)(resstr[n + 2]);
                     DevFunction func = (DevFunction)(resstr[n + 3]);
                     DevChannel ch = (DevChannel)(resstr[n + 4]);
-                    if (addr != devAddr || func != devFunc || ch != devCh)      //判断回复是否一致
+                    //WT 20170730 
+                    //不去判断通道回复是否一致
+                    //在关闭某通道时，如果恰好是所有开关板都被关闭，会回复所有通道关闭 
+                    if (addr != devAddr || func != devFunc )//|| ch != devCh)      //判断回复是否一致
                         throw new Exception();
                     string res = len>0?resstr.Substring(n + 5, len):"";     //获取返回结果数据
                     string end = resstr.Substring(n + 5 + len, 1);      //检查结尾字符
@@ -194,15 +209,17 @@ namespace Sensor
 
         internal void enablePressure()
         {
-            command(DevAddress.DOUT_ONBOARD, DevFunction.SET_DOUT_STA, DevChannel.CH_NONE, "1");
+            command(DevAddress.DOUT_ONBOARD, DevFunction.SET_DOUT_STA, DevChannel.CH0, "1");
         }
         internal void disablePressure()
         {
-            command(DevAddress.DOUT_ONBOARD, DevFunction.SET_DOUT_STA, DevChannel.CH_NONE, "0");
+            command(DevAddress.DOUT_ONBOARD, DevFunction.SET_DOUT_STA, DevChannel.CH0, "0");
         }
         internal void setPowerVoltage(double volt)
         {
-            string s = String.Format("{0:D4}", (int)(volt*100));   //12.00f -> 1200
+            //WT 20170730
+            //修改发送电压命令，使用浮点不使用整数形式
+            string s = String.Format("{0:D4}", (int)(volt));   //12.00f 
             command(DevAddress.POWER_SUPPLY, DevFunction.SET_POWER_SUPPLY_VOLTAGE, DevChannel.CH_NONE, s);
         }
 
@@ -213,8 +230,9 @@ namespace Sensor
 
         internal double getTestVoltage()
         {
-            string res = command(DevAddress.VOLTMETER, DevFunction.SET_DOUT_STA, DevChannel.CH_NONE, "1");
-            return (double.Parse(res)/100);     //1200 -> 12.00f
+            
+              string res = command(DevAddress.VOLTMETER, DevFunction.GET_VOLTAGE_CALIBRATED, DevChannel.CH_NONE, "");
+            return (double.Parse(res));  
         }
 
         internal void closeSlotChannel(int slot, int ch)
@@ -224,14 +242,16 @@ namespace Sensor
 
         internal double getSourcePressure()
         {
-            string res = command(DevAddress.PRESSURE_GAUGE, DevFunction.GET_PRESSURE_CALIBRATED, DevChannel.CH0, "");
-            return (double.Parse(res) / 1000);     //1000 -> 1.000f
+            //  string res = command(DevAddress.PRESSURE_GAUGE, DevFunction.GET_PRESSURE_CALIBRATED, //DevChannel.CH0, "");
+            //   return (double.Parse(res)); 
+            return 0.1;    
         }
 
         internal double getInnerPressure()
         {
-            string res = command(DevAddress.PRESSURE_GAUGE, DevFunction.GET_PRESSURE_CALIBRATED, DevChannel.CH1, "");
-            return (double.Parse(res) / 1000);     //1000 -> 1.000f
+          //  string res = command(DevAddress.PRESSURE_GAUGE, DevFunction.GET_PRESSURE_CALIBRATED, DevChannel.CH1, "");
+            //return (double.Parse(res) );
+            return 0.2;  
         }
         internal bool findSlot(int v)
         {
