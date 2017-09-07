@@ -11,13 +11,13 @@ namespace Sensor
 {
     public partial class FormConfig : Form
     {
-
         public CheckBox[] channelsSlotCks;      //插槽复选框
         public CheckBox[,] channelsCks;         //通道复选框
         private Dictionary<string, FormMain.ParamDesc> sensorParamTable;
         private Dictionary<string, FormMain.ParamDesc> testParamTable;
         bool[,] channelEnableTable;
         string[] channelNumbers;
+        ComboBox selectComboBox;
 
         public FormConfig(
             Dictionary<string, FormMain.ParamDesc> sensorParamTable,    //传感器参数 
@@ -55,8 +55,7 @@ namespace Sensor
 
             FormMain.addParamsToGrid(sensorParamsGrid, sensorParamTable);
             FormMain.addParamsToGrid(testParamsGrid, testParamTable);
-            
-            
+
             //禁止选中
             foreach (DataGridViewRow i in sensorParamsGrid.Rows)
             {
@@ -259,6 +258,8 @@ namespace Sensor
             this.Close();
         }
 
+
+        //保存参数按钮
         private void button2_Click(object sender, EventArgs e)
         {
            /*
@@ -267,9 +268,10 @@ namespace Sensor
             DialogResult res = MessageBox.Show(this, "确认修改参数?", "提示", MessageBoxButtons.OKCancel);
             if (res == DialogResult.Cancel)
                 return;
-
+            //写数据到表格
             FormMain.writeParamsFromGrid(sensorParamTable, sensorParamsGrid);
             FormMain.writeParamsFromGrid(testParamTable, testParamsGrid);
+            //设置通道有效性
             for (int slot = 0; slot < 10; slot++)
             {
                 for (int ch = 0; ch < 5; ch++)
@@ -277,7 +279,9 @@ namespace Sensor
                     channelEnableTable[slot, ch] = channelsCks[slot, ch].Checked;
                 }
             }
+
             int count = channelsGrid.Rows.Count;
+
             for (int i = 0; i < count; i++)
             {
                 channelNumbers[i] = channelsGrid.Rows[i].Cells[1].Value.ToString();
@@ -294,22 +298,99 @@ namespace Sensor
             string value = sensorParamsGrid[e.ColumnIndex, e.RowIndex].Value.ToString();
             double val;
             FormMain.ParamDesc paramDesc = sensorParamTable[key];
-            if (double.TryParse(value, out val) == false) {
-                MessageBox.Show(this, "输入值不合法");
-                sensorParamsGrid[e.ColumnIndex, e.RowIndex].Value = paramDesc.getValue();
-                return;
+            if (paramDesc.isStrItem())
+            {
+                if (paramDesc.getStrList().Contains(value) == false)
+                {
+                    MessageBox.Show(this, "输入值不合法: "+ paramDesc.getFormat());
+                }
+            }
+            else
+            {
+                if (double.TryParse(value, out val) == false)
+                {
+                    MessageBox.Show(this, "输入值不合法");
+                    sensorParamsGrid[e.ColumnIndex, e.RowIndex].Value = paramDesc.getValue();
+                    return;
+                }
+
+                if (val < paramDesc.getMin() || val > paramDesc.getMax())
+                {
+                    MessageBox.Show(this, String.Format("输入值超出范围 [{0},{1}]", paramDesc.getMin(), paramDesc.getMax()));
+                    sensorParamsGrid[e.ColumnIndex, e.RowIndex].Value = paramDesc.getValue();
+                    return;
+                }
             }
 
-            if (val < paramDesc.getMin() || val > paramDesc.getMax())
+        }
+        private void testParamsGrid_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        {
+            DataGridViewCell keyCell = testParamsGrid[e.ColumnIndex - 1, e.RowIndex];
+            DataGridViewCell valCell = testParamsGrid[e.ColumnIndex, e.RowIndex];
+            string key = keyCell.Value.ToString();
+            string value = valCell.Value.ToString();
+            FormMain.ParamDesc paramDesc = testParamTable[key];
+            if (paramDesc.isStrItem())
             {
-                MessageBox.Show(this, String.Format("输入值超出范围 [{0},{1}]", paramDesc.getMin(), paramDesc.getMax()));
-                sensorParamsGrid[e.ColumnIndex, e.RowIndex].Value = paramDesc.getValue();
-                return;
+                selectComboBox = new ComboBox();
+                selectComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+                selectComboBox.Text = value;
+                selectComboBox.Tag = valCell;
+                selectComboBox.Items.AddRange(paramDesc.getStrList());
+                selectComboBox.Parent = testParamsGrid;
+                Rectangle rect = testParamsGrid.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
+                selectComboBox.Location = rect.Location;
+                selectComboBox.Size = rect.Size;
+                selectComboBox.Text = value;
+                selectComboBox.TextChanged += Comb_TextChanged;
+                selectComboBox.FormattingEnabled = true;
+                selectComboBox.Show();
             }
-            
 
         }
 
+        private void Comb_TextChanged(object sender, EventArgs e)
+        {
+            ComboBox comb = (ComboBox)sender;
+            DataGridViewCell valCell = (DataGridViewCell)(comb.Tag);
+            valCell.Value = comb.Text;
+        }
+
+        private void testParamsGrid_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            if (selectComboBox!=null)
+            {
+                selectComboBox.Hide();
+                selectComboBox = null;
+            }
+            string key = testParamsGrid[e.ColumnIndex - 1, e.RowIndex].Value.ToString();
+            string value = testParamsGrid[e.ColumnIndex, e.RowIndex].Value.ToString();
+            double val;
+            FormMain.ParamDesc paramDesc = testParamTable[key];
+            if (paramDesc.isStrItem())
+            {
+                if (paramDesc.getStrList().Contains(value) == false)
+                {
+                    MessageBox.Show(this, "输入值不合法: " + paramDesc.getFormat());
+                }
+            }
+            else
+            {
+                if (double.TryParse(value, out val) == false)
+                {
+                    MessageBox.Show(this, "输入值不合法");
+                    testParamsGrid[e.ColumnIndex, e.RowIndex].Value = paramDesc.getValue();
+                    return;
+                }
+
+                if (val < paramDesc.getMin() || val > paramDesc.getMax())
+                {
+                    MessageBox.Show(this, String.Format("输入值超出范围 [{0},{1}]", paramDesc.getMin(), paramDesc.getMax()));
+                    testParamsGrid[e.ColumnIndex, e.RowIndex].Value = paramDesc.getValue();
+                    return;
+                }
+            }
+        }
         private void testParamsGrid_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
@@ -333,7 +414,13 @@ namespace Sensor
 
         private void sensorParamsGrid_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
+        }
+
+        private void groupBox2_Enter(object sender, EventArgs e)
+        {
 
         }
+
+
     }
 }

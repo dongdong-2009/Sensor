@@ -35,6 +35,8 @@ namespace Sensor
         }
         public void close()
         {
+            sw.Close();
+            fs.Close();
         }
         internal void insertLowTestVal(int cycle, int slot, int ch, string sensor_nm, double lowval, bool lpass)
         {
@@ -49,6 +51,20 @@ namespace Sensor
             sw.WriteLine(s);
         }
 
-        
+        internal static void removeRecordFiles(int days)
+        {
+            TimeSpan ts = new TimeSpan(days, 0, 0, 0);
+            DateTime now = DateTime.Now;
+            DateTime date = now - ts;
+            string limit = "rec_" + date.ToString("yyyyMMdd");
+            DirectoryInfo dir = new DirectoryInfo(Environment.CurrentDirectory);
+            foreach (DirectoryInfo d in dir.GetDirectories())
+            {
+                if (d.Name.StartsWith("rec_") && string.Compare(d.Name, limit) < 0)
+                {
+                    Directory.Delete(d.Name, true);
+                }
+            }
+        }
     }
 }

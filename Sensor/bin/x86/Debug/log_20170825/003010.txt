@@ -1,0 +1,7 @@
+[00:30:11:160]closeAllChannel
+[00:30:11:176]send command: :10s80=
+[00:30:11:333]recv result: 
+[00:30:11:333]send command: :10s80=
+[00:30:11:489]recv result: 
+[00:30:11:489]send command: :10s80=
+[00:30:11:645]recv result: 

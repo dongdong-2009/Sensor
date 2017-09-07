@@ -1,0 +1,4 @@
+H 0 0 0 -0.248 False SN0001
+H 0 0 1 -0.248 False SN0002
+H 0 0 2 -0.248 False SN0003
+H 0 0 3 -0.248 False SN0004

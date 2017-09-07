@@ -1,13 +1,10 @@
 ﻿using hxTestTool;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using static Sensor.FormMain;
+
 
 namespace Sensor
 {
@@ -76,7 +73,7 @@ namespace Sensor
         Mutex mut = new Mutex();
         ComPort ser = null;
         FileStream logfs;
-        StreamWriter log;
+        StreamWriter log; 
         public Device()
         {
             DateTime now = DateTime.Now;
@@ -89,6 +86,20 @@ namespace Sensor
             log.AutoFlush = true;
             
         }
+        internal static void removeLogFiles(int days)
+        {
+            TimeSpan ts = new TimeSpan(days, 0, 0, 0);
+            DateTime now = DateTime.Now;
+            DateTime date = now - ts;
+            string limit = "log_" + date.ToString("yyyyMMdd");
+            DirectoryInfo dir = new DirectoryInfo(Environment.CurrentDirectory);
+            foreach (DirectoryInfo d in dir.GetDirectories()) {
+                if (d.Name.StartsWith("log_") && string.Compare(d.Name,limit)<0) {
+                    Directory.Delete(d.Name, true);
+                }
+            }
+        }
+
         void write_log(string s)
         {
             log.WriteLine(DateTime.Now.ToString("[HH:mm:ss:fff]") + s);
@@ -113,6 +124,7 @@ namespace Sensor
             if (ser.Open(2) == false)
             {
                 ser.Close();
+
                 ser = null;
                 mut.ReleaseMutex();
                 return false;
@@ -145,7 +157,8 @@ namespace Sensor
             write_log(new StackFrame(1).GetMethod().Name);
             if (ser == null)
             {
-                throw new Exception("内部错误,无效的串口对象");
+                MessageBox.Show("内部错误,无效的串口对象");
+                //throw new Exception("内部错误,无效的串口对象");
             }
             mut.WaitOne();
             ser.Recive(1024, 1);    //clear rbuffer
@@ -199,6 +212,8 @@ namespace Sensor
             throw new Exception("Device send command, but recive error, cmd: " + cmdstr);
         }
 
+       
+
         internal void closeAllChannel()
         {
             for (DevAddress devAddr = DevAddress.SWITCH_BOARD_0; devAddr <= DevAddress.SWITCH_BOARD_9; devAddr++)
@@ -242,16 +257,16 @@ namespace Sensor
 
         internal double getSourcePressure()
         {
-            //  string res = command(DevAddress.PRESSURE_GAUGE, DevFunction.GET_PRESSURE_CALIBRATED, //DevChannel.CH0, "");
-            //   return (double.Parse(res)); 
-            return 0.1;    
+            string res = command(DevAddress.PRESSURE_GAUGE, DevFunction.GET_PRESSURE_CALIBRATED, DevChannel.CH0, "");
+               return (double.Parse(res));
+         
         }
 
         internal double getInnerPressure()
         {
-          //  string res = command(DevAddress.PRESSURE_GAUGE, DevFunction.GET_PRESSURE_CALIBRATED, DevChannel.CH1, "");
-            //return (double.Parse(res) );
-            return 0.2;  
+            string res = command(DevAddress.PRESSURE_GAUGE, DevFunction.GET_PRESSURE_CALIBRATED, DevChannel.CH1, "");
+            return (double.Parse(res));
+          
         }
         internal bool findSlot(int v)
         {

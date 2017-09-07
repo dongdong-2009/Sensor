@@ -1,0 +1,34 @@
+[08:47:08:204]findSlot
+[08:47:08:221]send command: :00tn=
+[08:47:08:377]recv result: #00tn*
+[08:47:08:377]findSlot
+[08:47:08:393]send command: :01tn=
+[08:47:08:549]recv result: #01tn*
+[08:47:08:549]findSlot
+[08:47:08:580]send command: :02tn=
+[08:47:08:737]recv result: #02tn*
+[08:47:08:737]findSlot
+[08:47:08:768]send command: :03tn=
+[08:47:08:924]recv result: #03tn*
+[08:47:08:924]findSlot
+[08:47:08:940]send command: :04tn=
+[08:47:09:096]recv result: 憿⒐?
+[08:47:09:096]send command: :04tn=
+[08:47:09:252]recv result: #04tn*
+[08:47:09:252]findSlot
+[08:47:09:283]send command: :05tn=
+[08:47:09:440]recv result: 摢⒐?
+[08:47:09:440]send command: :05tn=
+[08:47:09:596]recv result: #05tn*
+[08:47:09:596]findSlot
+[08:47:09:612]send command: :06tn=
+[08:47:09:767]recv result: #06tn*
+[08:47:09:767]findSlot
+[08:47:09:783]send command: :07tn=
+[08:47:09:940]recv result: #07tn*
+[08:47:09:940]findSlot
+[08:47:09:971]send command: :08tn=
+[08:47:10:143]recv result: #08tn*
+[08:47:10:143]findSlot
+[08:47:10:158]send command: :09tn=
+[08:47:10:314]recv result: #09tn*

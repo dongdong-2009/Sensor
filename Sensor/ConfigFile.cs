@@ -1,5 +1,21 @@
 ﻿using System;
 using hxUtils;
+public class AppConfig : INIConfig
+{
+    public string rem_配置文件版本
+     = "说明: \n"
+     + "1. 删除该配置文件后应用程序一般会自动重新生成一个新的,并设置每个配置项为默认参数\n"
+     + "2. 配置文件按行读取,每一行一个配置项\n"
+     + "3. 符号\"#\"之后直到一行末尾为注释,对应用程序无任何影响.\n"
+     + "4. 不建议直接修改配置文件.\n";
+    public string 配置文件版本 = "0.3";
+
+    public string rem_日志过期时间 = "单位:天, 超过该时间的日志将被自动删除.不需要改功能设置为-1, 不保存日志为0";
+    public int 日志过期时间 = 30;
+    public string rem_记录过期时间 = "单位:天, 超过该时间的记录将被自动删除.不需要改功能设置为-1, 不保存记录为0";
+    public int 记录过期时间 = 30;
+}
+
 
 public class Config : INIConfig
 {
@@ -38,7 +54,11 @@ public class Config : INIConfig
         /// 0:都不测试  1:每次都测试  2:间隔一次测试
         /// 算法是 当值为0都不测试, 当值>=1,用当前的周期%他,如果为0就进行测量.不为0则不测量.
         /// </summary>
-        public int 测量周期步进 = 1;  //HXD 20170804 
+        public int 测量周期步进 = 2;  //HXD 20170804 
+        public int 上电时间 = 200;
+        public int 气压稳定时间 = 500;
+        public string rem_老化方式 = "恒压老化 或者 动态老化";
+        public string 老化方式 = "恒压老化";
 
     }
 

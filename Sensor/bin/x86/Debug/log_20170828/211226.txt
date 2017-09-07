@@ -1,0 +1,186 @@
+[21:12:26:744]closeAllChannel
+[21:12:26:776]send command: :10s80=
+[21:12:26:931]recv result: #10s80*
+[21:12:26:931]closeAllChannel
+[21:12:26:947]send command: :11s80=
+[21:12:27:119]recv result: #11s80*
+[21:12:27:119]closeAllChannel
+[21:12:27:151]send command: :12s80=
+[21:12:27:307]recv result: #12s80*
+[21:12:27:307]closeAllChannel
+[21:12:27:338]send command: :13s80=
+[21:12:27:526]recv result: #13s80*
+[21:12:27:526]closeAllChannel
+[21:12:27:557]send command: :14s80=
+[21:12:27:729]recv result: #14s80*
+[21:12:27:729]closeAllChannel
+[21:12:27:760]send command: :15s80=
+[21:12:27:947]recv result: #15s80*
+[21:12:27:947]closeAllChannel
+[21:12:27:978]send command: :16s80=
+[21:12:28:134]recv result: #16s80*
+[21:12:28:134]closeAllChannel
+[21:12:28:150]send command: :17s80=
+[21:12:28:338]recv result: #17s80*
+[21:12:28:338]closeAllChannel
+[21:12:28:354]send command: :18s80=
+[21:12:28:525]recv result: #18s80*
+[21:12:28:525]closeAllChannel
+[21:12:28:541]send command: :19s80=
+[21:12:28:713]recv result: #19s80*
+[21:12:28:713]setPowerVoltage
+[21:12:28:743]send command: :4Sqn0024=
+[21:12:28:932]recv result: #0Sqn*
+[21:12:29:009]enablePressure
+[21:12:29:025]send command: :1Oo01=
+[21:12:29:197]recv result: #1Oo01*
+[21:12:29:728]getSourcePressure
+[21:12:29:744]send command: :0Pm0=
+[21:12:29:932]recv result: #7Pm0-0.1677*
+[21:12:29:932]getInnerPressure
+[21:12:29:963]send command: :0Pm1=
+[21:12:30:166]recv result: #6Pm10.1017*
+[21:12:30:166]selectSlotChannel
+[21:12:30:197]send command: :10s01=
+[21:12:30:369]recv result: #10s01*
+[21:12:30:432]getTestVoltage
+[21:12:30:448]send command: :0Vcn=
+[21:12:30:650]recv result: #4Vcn6.21*
+[21:12:30:650]selectSlotChannel
+[21:12:30:665]send command: :10s11=
+[21:12:30:822]recv result: #10s11*
+[21:12:30:884]getTestVoltage
+[21:12:30:900]send command: :0Vcn=
+[21:12:31:073]recv result: #4Vcn6.17*
+[21:12:31:073]selectSlotChannel
+[21:12:31:103]send command: :10s21=
+[21:12:31:275]recv result: #10s21*
+[21:12:31:338]getTestVoltage
+[21:12:31:353]send command: :0Vcn=
+[21:12:31:557]recv result: #4Vcn6.43*
+[21:12:31:557]selectSlotChannel
+[21:12:31:587]send command: :10s31=
+[21:12:31:745]recv result: #10s31*
+[21:12:31:807]getTestVoltage
+[21:12:31:823]send command: :0Vcn=
+[21:12:32:010]recv result: #4Vcn6.13*
+[21:12:32:010]selectSlotChannel
+[21:12:32:040]send command: :10s41=
+[21:12:32:197]recv result: #10s41*
+[21:12:32:260]getTestVoltage
+[21:12:32:275]send command: :0Vcn=
+[21:12:32:478]recv result: #4Vcn6.49*
+[21:12:32:478]closeSlotChannel
+[21:12:32:493]send command: :10s40=
+[21:12:32:650]recv result: #10s80*
+[21:12:32:650]selectSlotChannel
+[21:12:32:665]send command: :11s01=
+[21:12:32:838]recv result: #11s01*
+[21:12:32:900]getTestVoltage
+[21:12:32:931]send command: :0Vcn=
+[21:12:33:119]recv result: #4Vcn6.17*
+[21:12:33:119]selectSlotChannel
+[21:12:33:150]send command: :11s11=
+[21:12:33:307]recv result: #11s11*?
+[21:12:33:384]getTestVoltage
+[21:12:33:400]send command: :0Vcn=
+[21:12:33:572]recv result: #4Vcn6.28*
+[21:12:33:572]selectSlotChannel
+[21:12:33:603]send command: :11s21=
+[21:12:33:775]recv result: #11s21*
+[21:12:33:838]getTestVoltage
+[21:12:33:868]send command: :0Vcn=
+[21:12:34:056]recv result: #4Vcn6.21*
+[21:12:34:056]selectSlotChannel
+[21:12:34:071]send command: :11s31=
+[21:12:34:228]recv result: #11s31*
+[21:12:34:291]getTestVoltage
+[21:12:34:307]send command: :0Vcn=
+[21:12:34:494]recv result: #4Vcn6.24*
+[21:12:34:494]selectSlotChannel
+[21:12:34:525]send command: :11s41=
+[21:12:34:697]recv result: #11s41*
+[21:12:34:760]getTestVoltage
+[21:12:34:775]send command: :0Vcn=
+[21:12:34:963]recv result: #4Vcn6.19*
+[21:12:34:963]closeSlotChannel
+[21:12:34:993]send command: :11s40=
+[21:12:35:150]recv result: #11s80*
+[21:12:35:150]selectSlotChannel
+[21:12:35:166]send command: :12s01=
+[21:12:35:338]recv result: #12s01*
+[21:12:35:415]getTestVoltage
+[21:12:35:431]send command: :0Vcn=
+[21:12:35:635]recv result: #4Vcn6.12*
+[21:12:35:635]selectSlotChannel
+[21:12:35:665]send command: :12s11=
+[21:12:35:823]recv result: #12s11*
+[21:12:35:900]getTestVoltage
+[21:12:35:916]send command: :0Vcn=
+[21:12:36:104]recv result: #4Vcn6.33*
+[21:12:36:104]selectSlotChannel
+[21:12:36:134]send command: :12s21=
+[21:12:36:306]recv result: #12s21*
+[21:12:36:369]getTestVoltage
+[21:12:36:385]send command: :0Vcn=
+[21:12:36:572]recv result: #4Vcn6.30*
+[21:12:36:572]selectSlotChannel
+[21:12:36:603]send command: :12s31=
+[21:12:36:760]recv result: #12s31*
+[21:12:36:822]getTestVoltage
+[21:12:36:854]send command: :0Vcn=
+[21:12:37:041]recv result: #4Vcn6.28*
+[21:12:37:041]selectSlotChannel
+[21:12:37:056]send command: :12s41=
+[21:12:37:228]recv result: #12s41*
+[21:12:37:291]getTestVoltage
+[21:12:37:307]send command: :0Vcn=
+[21:12:37:510]recv result: #4Vcn6.22*
+[21:12:37:510]closeSlotChannel
+[21:12:37:540]send command: :12s40=
+[21:12:37:698]recv result: #12s80*
+[21:12:37:698]selectSlotChannel
+[21:12:37:713]send command: :13s01=
+[21:12:37:869]recv result: #13s01*
+[21:12:37:931]getTestVoltage
+[21:12:37:947]send command: :0Vcn=
+[21:12:38:134]recv result: #4Vcn6.35*
+[21:12:38:134]selectSlotChannel
+[21:12:38:150]send command: :13s11=
+[21:12:38:307]recv result: #13s11*
+[21:12:38:369]getTestVoltage
+[21:12:38:384]send command: :0Vcn=
+[21:12:38:572]recv result: #4Vcn6.38*
+[21:12:38:572]selectSlotChannel
+[21:12:38:587]send command: :13s21=
+[21:12:38:744]recv result: #13s21*
+[21:12:38:807]getTestVoltage
+[21:12:38:822]send command: :0Vcn=
+[21:12:39:025]recv result: #4Vcn5.60*
+[21:12:39:025]selectSlotChannel
+[21:12:39:056]send command: :13s31=
+[21:12:39:228]recv result: #13s31*
+[21:12:39:291]getTestVoltage
+[21:12:39:306]send command: :0Vcn=
+[21:12:39:493]recv result: #4Vcn6.28*
+[21:12:39:493]selectSlotChannel
+[21:12:39:509]send command: :13s41=
+[21:12:39:666]recv result: #13s41*
+[21:12:39:728]getTestVoltage
+[21:12:39:744]send command: :0Vcn=
+[21:12:39:931]recv result: #4Vcn6.32*
+[21:12:39:931]closeSlotChannel
+[21:12:39:946]send command: :13s40=
+[21:12:40:057]disablePressure
+[21:12:40:104]recv result: #13s80*
+[21:12:40:104]disablePressure
+[21:12:40:135]send command: :1Oo00=
+[21:12:40:307]recv result: #1Oo00*
+[21:12:40:338]send command: :1Oo00=
+[21:12:40:525]recv result: #1Oo00*
+[21:12:41:040]getSourcePressure
+[21:12:41:056]send command: :0Pm0=
+[21:12:41:244]recv result: #7Pm0-0.1600*
+[21:12:41:244]getInnerPressure
+[21:12:41:275]send command: :0Pm1=
+[21:12:41:463]recv result: #6Pm10.1036*

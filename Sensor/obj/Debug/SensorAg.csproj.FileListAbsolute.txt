@@ -1,0 +1,11 @@
+\\Mac\Home\Downloads\Sensor\Sensor\bin\Debug\SensorAg.exe.config
+\\Mac\Home\Downloads\Sensor\Sensor\bin\Debug\SensorAg.exe
+\\Mac\Home\Downloads\Sensor\Sensor\bin\Debug\SensorAg.pdb
+\\Mac\Home\Downloads\Sensor\Sensor\bin\Debug\Aspose.Cells.dll
+\\Mac\Home\Downloads\Sensor\Sensor\bin\Debug\Aspose.Cells.xml
+\\Mac\Home\Downloads\Sensor\Sensor\obj\Debug\Sensor.FormConfig.resources
+\\Mac\Home\Downloads\Sensor\Sensor\obj\Debug\Sensor.FormMain.resources
+\\Mac\Home\Downloads\Sensor\Sensor\obj\Debug\SensorAg.Properties.Resources.resources
+\\Mac\Home\Downloads\Sensor\Sensor\obj\Debug\SensorAg.csproj.GenerateResource.Cache
+\\Mac\Home\Downloads\Sensor\Sensor\obj\Debug\SensorAg.exe
+\\Mac\Home\Downloads\Sensor\Sensor\obj\Debug\SensorAg.pdb

@@ -16,6 +16,7 @@ namespace Sensor
     {
         public class ParamDesc
         {
+            private string strValue = null;
             private double value;
             private string fmt;     //显示格式
             private string unit;    //单位
@@ -25,7 +26,18 @@ namespace Sensor
 
             public ParamDesc(double default_value, string fmt, string unit, double min, double max, double step)
             {
+                this.strValue = null;
                 this.value = default_value;
+                this.fmt = fmt;
+                this.unit = unit;
+                this.min = min;
+                this.max = max;
+                this.step = step;
+
+            }
+            public ParamDesc(string default_value, string fmt, string unit, double min, double max, double step)
+            {
+                this.strValue = default_value;
                 this.fmt = fmt;
                 this.unit = unit;
                 this.min = min;
@@ -35,6 +47,8 @@ namespace Sensor
             }
             public string getValue()
             {
+                if (strValue!=null)
+                    return strValue;
                 if (unit.Trim() == "%")
                     return (value * 100).ToString(fmt);
                 return value.ToString(fmt);
@@ -50,6 +64,11 @@ namespace Sensor
 
             internal void setValue(string v)
             {
+                if (strValue != null)
+                {
+                    strValue = v;
+                    return;
+                }
                 if (unit.Trim() == "%")
                 {
                     value = Convert.ToDouble(v)/100.0;
@@ -77,6 +96,15 @@ namespace Sensor
             {
                 return max;
             }
+            internal string[] getStrList()
+            {
+                return fmt.Split('|');
+            }
+
+            internal bool isStrItem()
+            {
+                return strValue != null;
+            }
         }
 
         ParamDesc pressureParamDesc; //压力值用的格式化字符串和单位等描述用于测试时界面显示.
@@ -84,7 +112,8 @@ namespace Sensor
         public Dictionary<String, ParamDesc> testParamTable = new Dictionary<string, ParamDesc>();          //测试参数表
         public bool[,] channelEnableTable = new bool[10, 5];        //通道使能表
         string[] channelNumbers = new string[50];                   //传感器编号
-        Config config;              //配置文件
+        Config config;              //配置文件,用于测试相关参数
+        AppConfig appConfig;        //应用程序的配置
         Database db ;               //数据存储
         public FormMain()
         {
@@ -93,6 +122,20 @@ namespace Sensor
 
         private void FormMain_Load(object sender, EventArgs e)
         {
+            //应用程序的配置
+            appConfig = new AppConfig();
+            appConfig.LoadIniFileInCurDir("sensor.ini");
+            appConfig.SaveIniFile();
+            //删除过期的日志和记录
+            if (appConfig.日志过期时间 >= 0)
+            {
+                //log
+                Device.removeLogFiles(appConfig.日志过期时间);
+            }
+            if (appConfig.记录过期时间 >= 0)
+            {
+                Database.removeRecordFiles(appConfig.记录过期时间);
+            }
             //主表创建
             channelsCrid.Rows.Clear();
             channelsCrid.Rows.Add(50);
@@ -149,6 +192,9 @@ namespace Sensor
             testParamTable.Add("充气(高压)时间", new ParamDesc(config.测试参数.充气高压时间, "", "秒", 1, 200, 1));
             testParamTable.Add("排气(静置)时间", new ParamDesc(config.测试参数.排气静置时间, "", "秒", 1, 200, 1));
             testParamTable.Add("测量周期步进", new ParamDesc(config.测试参数.测量周期步进, "", "周期", 0, 10000, 1));
+            testParamTable.Add("上电时间", new ParamDesc(config.测试参数.上电时间, "", "毫秒", 10, 10000, 1));
+            testParamTable.Add("气压稳定时间", new ParamDesc(config.测试参数.气压稳定时间, "", "毫秒", 10, 10000, 1));
+            testParamTable.Add("老化方式", new ParamDesc(config.测试参数.老化方式, "恒压老化|动态老化", "-", 0, 0, 0));
 
             pressureParamDesc = testParamTable["充气(高压)压力"];
             if (pressureParamDesc == null)
@@ -200,6 +246,10 @@ namespace Sensor
             config.测试参数.充气高压压力 = testParamTable["充气(高压)压力"].getValue2();
             config.测试参数.充气高压时间 = (int)testParamTable["充气(高压)时间"].getValue2();
             config.测试参数.排气静置时间 = (int)testParamTable["排气(静置)时间"].getValue2();
+            config.测试参数.测量周期步进 = (int)testParamTable["测量周期步进"].getValue2();
+            config.测试参数.上电时间 = (int)testParamTable["上电时间"].getValue2();
+            config.测试参数.气压稳定时间 = (int)testParamTable["气压稳定时间"].getValue2();
+            config.测试参数.老化方式 = testParamTable["老化方式"].getValue();
 
             config.设备参数.禁用的通道 = "";
             for (int slot = 0; slot < 10; slot++)
@@ -245,9 +295,13 @@ namespace Sensor
             {
                 String key = table.Keys.ToArray()[i];
                 grid.Rows[i].Cells[0].Value = key;
+                grid.Rows[i].Cells[0].Tag = table[key];
                 grid.Rows[i].Cells[1].Value = table[key].getValue();
+                grid.Rows[i].Cells[1].Tag = table[key];
                 grid.Rows[i].Cells[2].Value = table[key].getUnit();
+                grid.Rows[i].Cells[2].Tag = table[key];
             }
+
         }
         internal static void writeParamsFromGrid(Dictionary<string, ParamDesc> table, DataGridView grid)
         {
@@ -314,9 +368,12 @@ namespace Sensor
                     MessageBox.Show(this, "配置文件不完整,无法加载所有参数!");
                     return;
                 }
-                config.SaveIniFile();
-                config = null; 
-                config = c;
+                if (config != null)
+                {
+                    config.SaveIniFile();
+                    config = null;
+                    config = c;
+                }
             }
         }
 
@@ -354,7 +411,7 @@ namespace Sensor
             TestCurrentTime,            //当前周期历时
             LowPressureVal_dddf,          //传感器低压信息,参数:插槽,通道,传感器输出电压值,气源压力值,工装内压力值
             HighPressureVal_dddf,          //传感器高压信息,同上
-            EndChannelTest_dd,                 //完成一个通道的高低压测试.
+            EndChannelTest_dd,         //完成一个通道的高低压测试.
 
             //HXD 20170804
             EndChargePresure_ff,           //充气完成
@@ -365,6 +422,7 @@ namespace Sensor
         Device device = null;
         int timeBegainTest = 0;
         int timeBegainCycle = 0;
+        double source_pressure,inner_pressure;
         private void timer1_Tick(object sender, EventArgs e)
         {
             if (runFlag)
@@ -499,8 +557,20 @@ namespace Sensor
                             double highval = 0.0;
                             double.TryParse(channelsCrid[highValueCol.Index, slot * 5 + ch].Value.ToString(), out highval);
                             double dlta = config.传感器参数.传感器精度 * (config.传感器参数.传感器量程最大值 - config.传感器参数.传感器量程最小值);
-                            double h_lval = config.测试参数.充气高压压力 - dlta;
-                            double h_rval = config.测试参数.充气高压压力 + dlta;
+
+                            //WT 20170825 恒压老化时使用的合格压力范围
+                            double h_lval, h_rval;
+                            if (config.测试参数.老化方式 == "恒压老化")
+                            {
+                                h_lval = config.测试参数.充气高压压力 - dlta;
+                                h_rval = config.测试参数.充气高压压力 + dlta;
+                            }
+                            else
+                            {
+                                //WT 20170825 动态老化时使用的合格压力范围
+                                h_lval = inner_pressure - dlta;
+                                h_rval = inner_pressure + dlta;
+                            }
                             bool hpass = true;
                             if (highval < h_lval || highval > h_rval)
                             {
@@ -579,11 +649,11 @@ namespace Sensor
                         }
                         //HXD 20170804
                         //充放气稳定后发送一次结果供显示
-                    case TestEvent.EndChargePresure_ff: 
+                    case TestEvent.EndChargePresure_ff:
                     case TestEvent.EndReleasePresure_ff:
                         {
-                            double source_pressure = (double)p[4];
-                            double inner_pressure = (double)p[5];
+                            double source_pressure = (double)p[0];
+                            double inner_pressure = (double)p[1];
                             labelSourcePressure.Text = "气源压力: " +
                                 source_pressure.ToString(pressureParamDesc.getFormat()) + " " + pressureParamDesc.getUnit();
                             labelInnerPressure.Text = "传感器工装内压力: " +
@@ -666,37 +736,35 @@ namespace Sensor
             {
                 if( device.Connect() == false)
                     throw new Exception("无法连接到设备");
+                
+                device.closeAllChannel();
                 SendTestEvent(TestEvent.TestBegain);
-
+                device.setPowerVoltage(config.传感器参数.传感器供电电压);
                 for (cycle_count=0; cycle_count<config.测试参数.老化周期数 && runFlag; cycle_count++)
                 {
-
                     SendTestEvent(TestEvent.CycleBegain);
                     SendTestEvent(TestEvent.CurrentCycleCount_d, cycle_count);
-
-                    device.closeAllChannel();
-                    device.setPowerVoltage(config.传感器参数.传感器供电电压);
                     device.enablePressure();
                     //记录此时时刻
                     period_start_time = System.Environment.TickCount/ 1000;
                     SendTestEvent(TestEvent.CurrentTestState_s, "正在充气");
                     //WT 20170730 
-                    //注释掉进气等待时间
                     //进气后约500ms气压就会稳定可以切换通道开始测量
                     //测量过程中花费的时间是算在进气时间内的
                     //如果测量时间超过近期时间，测量完毕后切换状态，否则继续等待直到超时
-                    //Thread.Sleep(config.测试参数.排气静置时间 * 1000);
+
                     //添加进气稳定延时
-                    Thread.Sleep(500);
+                    Thread.Sleep(config.测试参数.气压稳定时间); //500应改为气压稳定时间
 
                     //HXD 20170804
                     //充气完了发送一个事件
-                    double source_pressure = device.getSourcePressure();
-                    double inner_pressure = device.getInnerPressure();
+                     source_pressure = device.getSourcePressure();
+                     inner_pressure = device.getInnerPressure();
                     SendTestEvent(TestEvent.EndChargePresure_ff, source_pressure, inner_pressure);
 
-                    if (config.测试参数.测量周期步进!=0 && (cycle_count % config.测试参数.测量周期步进) == 0)
+                    if ((config.测试参数.测量周期步进 != 0) && ((cycle_count % config.测试参数.测量周期步进) == 0))
                     {
+                       
                         for (int slot = 0; slot < 10 && runFlag; slot++)
                         {
                             for (int ch = 0; ch < 5; ch++)
@@ -708,16 +776,9 @@ namespace Sensor
                                     goto end;
 
                                 device.selectSlotChannel(slot, ch);
-                                //WT 20170730
-                                //取消此时的延时
-                                // Thread.Sleep(500);
                                 SendTestEvent(TestEvent.CurrentTestSlotChannel_dd, slot, ch);
-                                Thread.Sleep(200);
-                                //不必每次都测量压力
-                                //double source_pressure = device.getSourcePressure();
-                                //double inner_pressure = device.getInnerPressure();
+                                Thread.Sleep(config.测试参数.上电时间); //应该为上电时间
                                 double sensor_volt = device.getTestVoltage();
-
                                 SendTestEvent(TestEvent.HighPressureVal_dddf, cycle_count, slot, ch, sensor_volt);
 
                                 if (ch == 4)
@@ -729,20 +790,20 @@ namespace Sensor
                     //等待该流程结束
                     while (System.Environment.TickCount / 1000 - period_start_time <= config.测试参数.充气高压时间)
                     {
+
                     }
                     device.disablePressure();
                     //记录此刻时间
                     period_start_time = System.Environment.TickCount / 1000;
-                    SendTestEvent(TestEvent.CurrentTestState_s, "正在排气");
-                    //Thread.Sleep(config.测试参数.排气静置时间 * 1000);
-                    Thread.Sleep(500);  //等待⽓气压稳定的时间约为500ms 
+                    SendTestEvent(TestEvent.CurrentTestState_s, "正在排气");                 
+                    Thread.Sleep(config.测试参数.气压稳定时间);   //500应改为气压稳定时间
 
                     //HXD 20170804
                     //放气完了发送一个事件
                     source_pressure = device.getSourcePressure();
-                    inner_pressure = device.getInnerPressure();
-                    SendTestEvent(TestEvent.EndChargePresure_ff, source_pressure, inner_pressure);
-                    if (config.测试参数.测量周期步进 != 0 && (cycle_count % config.测试参数.测量周期步进) == 0)
+                     inner_pressure = device.getInnerPressure();
+                    SendTestEvent(TestEvent.EndReleasePresure_ff, source_pressure, inner_pressure);
+                    if ((config.测试参数.测量周期步进 != 0) && ((cycle_count % config.测试参数.测量周期步进) == 0))
                     {
                         for (int slot = 0; slot < 10 && runFlag; slot++)
                         {
@@ -756,14 +817,9 @@ namespace Sensor
 
                                 device.selectSlotChannel(slot, ch);
                                 SendTestEvent(TestEvent.CurrentTestSlotChannel_dd, slot, ch);
-                                Thread.Sleep(200); //等待传感器器输出稳定的时间200ms
-                                                   //double source_pressure = device.getSourcePressure();
-                                                   //double inner_pressure = device.getInnerPressure();
+                                Thread.Sleep(config.测试参数.上电时间); ////应该为上电时间            
                                 double sensor_volt = device.getTestVoltage();
                                 SendTestEvent(TestEvent.LowPressureVal_dddf, cycle_count, slot, ch, sensor_volt);
-
-                                SendTestEvent(TestEvent.EndChannelTest_dd, slot, ch);
-
                                 if (ch == 4)
                                     device.closeSlotChannel(slot, ch);  //最後一個通道是需要關閉的.
                             }
@@ -832,6 +888,8 @@ namespace Sensor
             {
                 if(device!=null)
                     device.pause();
+
+
                 testThread.Suspend();
                 stopBtn.Enabled = false;
             }
@@ -850,6 +908,8 @@ namespace Sensor
                 MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 runFlag = false;
+                //关闭电磁阀的输出
+                device.disablePressure();
             }
         }
 
@@ -860,8 +920,17 @@ namespace Sensor
                 e.Cancel = true;
                 return;
             }
-            config.SaveIniFile();
-            config = null;
+            //关闭电磁阀的输出
+            if (device != null)
+            {
+                device.disablePressure();
+                device = null;
+            }
+            if (config != null)
+            {
+                config.SaveIniFile();
+                config = null;
+            }
         }
 
         private void findBtn_Click(object sender, EventArgs e)
@@ -897,7 +966,20 @@ namespace Sensor
             configBtn.Enabled = true;
 
         }
-        
+
+        private void create_sheet(Worksheet sheet )
+        {
+
+
+            sheet.Cells[0, 0].Value = "测试周期";
+            sheet.Cells[0, 1].Value = "插槽号";
+            sheet.Cells[0, 2].Value = "通道号";
+            sheet.Cells[0, 4].Value = "高压值";
+            sheet.Cells[0, 5].Value = "测试结果";
+            sheet.Cells[0, 7].Value = "低压值";
+            sheet.Cells[0, 8].Value = "测试结果";
+        }
+
         private void 导出测试数据ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (device != null)
@@ -907,7 +989,8 @@ namespace Sensor
             }
             string s = Database.lastRecordPath;
             string sname = Database.lastRecordDateTime;
-            if (s == null || s == "") {
+            if (s == null || s == "")
+            {
                 MessageBox.Show(this, "还没有测试数据.");
                 return;
             }
@@ -920,7 +1003,6 @@ namespace Sensor
                 string path = d.FileName;
                 try
                 {
-
                     Workbook book=null;
                     try
                     {
@@ -929,8 +1011,10 @@ namespace Sensor
                     catch { }
                     if (book == null)
                         book = new Workbook();  //没有模板也得用啊
+#if false
                     book.Worksheets.Add(SheetType.Worksheet);
                     book.Worksheets.Add(SheetType.Worksheet);
+
                     Worksheet sheetHigh = book.Worksheets[0];
                     Worksheet sheetLow = book.Worksheets[1];
                     sheetHigh.Name = "高压测试数据_" + sname;
@@ -966,6 +1050,7 @@ namespace Sensor
                         fs.Close();
                         return;
                     }
+
                     int rowcountLow = 1;
                     int rowcountHight = 1;
                     do
@@ -1010,6 +1095,100 @@ namespace Sensor
 
                     sr.Close();
                     fs.Close();
+#else
+
+                    Worksheet Sensor_sheet ;
+                    int sheet_counter = 0;
+                    int line_num = 2;
+                    FileStream fs = File.Open(s, FileMode.OpenOrCreate);
+                    StreamReader sr = new StreamReader(fs);
+                    string l = sr.ReadLine();
+                    if (l == null || l == "")
+                    {
+                        MessageBox.Show("没有数据需要导出.");
+                        sr.Close();
+                        fs.Close();
+                        return;
+                    }
+                    
+                    do
+                    {
+                        
+                        string[] ss = l.Split(' ');
+                        string flag = ss[0];
+                        int cycle = int.Parse(ss[1]);
+                        int slot = int.Parse(ss[2]);
+                        int ch = int.Parse(ss[3]);
+                        double val = double.Parse(ss[4]);
+                        bool pass = bool.Parse(ss[5]);
+                        string sensor_nm = ss[6];
+                        
+                        //根据sensor的序号选择要存储的位置
+                        if (sheet_counter == 0)
+                        {
+                            //创建第一个sheet
+                            book.Worksheets.Add(SheetType.Worksheet);
+                            Sensor_sheet = book.Worksheets[0];
+                            create_sheet(Sensor_sheet);
+                            Sensor_sheet.Name = sensor_nm;
+                            sheet_counter = 1;
+                        }
+                        else
+                        {
+                            Sensor_sheet = null;
+                            //查找该产品的sheet是否已经创建
+                            for (int i = 0; i < sheet_counter; i++)
+                            {
+                                if (book.Worksheets[i].Name == sensor_nm)
+                                {
+                                    Sensor_sheet = book.Worksheets[i];
+                                    break;
+                                }
+                            }
+                            if (Sensor_sheet == null)
+                            {
+                                //如果没有创建该产品的sheet则创建
+                                book.Worksheets.Add(SheetType.Worksheet);
+                                Sensor_sheet = book.Worksheets[sheet_counter];
+                                Sensor_sheet.Name = sensor_nm;
+                                sheet_counter++;
+                                create_sheet(Sensor_sheet);
+                            }
+
+                        }
+
+                        
+                        if (flag == "H")
+                        {
+                            //换行
+                            if (Sensor_sheet.Name == book.Worksheets[0].Name)
+                            {
+                                line_num++;
+                            }
+                            Sensor_sheet.Cells[line_num, 0].Value = cycle;
+                            Sensor_sheet.Cells[line_num, 1].Value = slot;
+                            Sensor_sheet.Cells[line_num, 2].Value = ch;
+                            Sensor_sheet.Cells[line_num, 4].Value = val;
+                            Sensor_sheet.Cells[line_num, 5].Value = pass ? "PASS" : "FAIL";
+                        }
+                        else if (flag == "L")
+                        {
+                            Sensor_sheet.Cells[line_num, 7].Value = val;
+                            Sensor_sheet.Cells[line_num, 8].Value = pass ? "PASS" : "FAIL";
+                        }
+                        else
+                        {
+
+                        }
+                   
+                        l = sr.ReadLine();
+                    } while (l != null && l != "");
+
+                    book.Save(path);
+
+                    sr.Close();
+                    fs.Close();
+#endif
                 }
                 catch (Exception ee)
                 {

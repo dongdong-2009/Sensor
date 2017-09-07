@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Sensor.Properties {
+namespace SensorAg.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

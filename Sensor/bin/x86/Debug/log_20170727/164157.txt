@@ -1,7 +1,0 @@
-[16:41:57:153]closeAllChannel
-[16:41:57:160]send command: +10sa0-
-[16:41:57:222]recv result: 
-[16:41:57:225]send command: +10sa0-
-[16:41:57:285]recv result: 
-[16:41:57:287]send command: +10sa0-
-[16:41:57:347]recv result: 
